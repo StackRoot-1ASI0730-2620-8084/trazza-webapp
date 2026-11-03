@@ -2,6 +2,7 @@ import {BaseApi} from "../../shared/infrastructure/base-api.js";
 import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
 const usersEndpointPath = import.meta.env.VITE_USERS_ENDPOINT_PATH;
+const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_PATH;
 
 /**
  * Infrastructure gateway for the IAM endpoints.
@@ -17,39 +18,31 @@ export class IamApi extends BaseApi {
     }
 
     /**
-     * Validates the credentials of a sign-in command against the users collection.
+     * Authenticates a user against the Trazza Platform API.
      *
      * @param {import('../domain/commands/sign-in.command.js').SignInCommand} signInCommand - Sign-in command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the matching users.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the user resource and its bearer token.
      */
     signIn(signInCommand) {
-        return this._usersEndpoint.getAll({ email: signInCommand.email, password: signInCommand.password });
-    }
-
-    /**
-     * Finds users registered with an e-mail.
-     *
-     * @param {string} email - Normalized e-mail.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the matching users.
-     */
-    findUsersByEmail(email) {
-        return this._usersEndpoint.getAll({ email });
+        return this.http.post(`${authenticationEndpointPath}/sign-in`, {
+            email: signInCommand.email,
+            password: signInCommand.password
+        });
     }
 
     /**
      * Registers a new user from a sign-up command.
      *
      * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created user.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the created user and its bearer token.
      */
     signUp(signUpCommand) {
-        return this._usersEndpoint.create({
+        return this.http.post(`${authenticationEndpointPath}/sign-up`, {
             fullName: signUpCommand.fullName,
             email: signUpCommand.email,
             phone: signUpCommand.phone,
             role: signUpCommand.role,
-            password: signUpCommand.password,
-            createdAt: new Date().toISOString()
+            password: signUpCommand.password
         });
     }
 
@@ -62,13 +55,12 @@ export class IamApi extends BaseApi {
     }
 
     /**
-     * Partially updates a user keeping its credentials.
+     * Updates the contact data (full name and phone) of a user.
      *
      * @param {Object} resource - User resource (must include id).
      * @returns {Promise<import('axios').AxiosResponse>} Response with the updated user.
      */
     updateUser(resource) {
-        return this._usersEndpoint.getById(resource.id)
-            .then(response => this._usersEndpoint.update(resource.id, { ...response.data, ...resource }));
+        return this._usersEndpoint.update(resource.id, { fullName: resource.fullName, phone: resource.phone });
     }
 }

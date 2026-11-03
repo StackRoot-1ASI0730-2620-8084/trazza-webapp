@@ -49,7 +49,5 @@ const performSignIn = async () => {
       ·
       <router-link :to="{ name: 'iam-sign-up', query: { role: 'merchant' } }" class="text-primary font-semibold">{{ t('sign-in.as-merchant') }}</router-link>
     </p>
-    <pv-divider/>
-    <p class="text-xs trazza-muted m-0">{{ t('sign-in.demo-hint') }}</p>
   </div>
 </template>
