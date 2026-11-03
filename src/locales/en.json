@@ -188,8 +188,7 @@
     "submit": "Sign in",
     "no-account": "Don't have an account?",
     "as-carrier": "Sign up as Carrier",
-    "as-merchant": "Sign up as Merchant",
-    "demo-hint": "Demo accounts: juan.ramos{'@'}email.com (carrier) and valeria.torres{'@'}email.com (merchant), password Trazza2026."
+    "as-merchant": "Sign up as Merchant"
   },
   "sign-up": {
     "title": "Create your account",

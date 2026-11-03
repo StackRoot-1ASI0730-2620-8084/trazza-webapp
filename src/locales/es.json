@@ -188,8 +188,7 @@
     "submit": "Iniciar sesión",
     "no-account": "¿No tienes cuenta?",
     "as-carrier": "Regístrate como transportista",
-    "as-merchant": "Regístrate como emprendedor",
-    "demo-hint": "Cuentas demo: juan.ramos{'@'}email.com (transportista) y valeria.torres{'@'}email.com (emprendedor), contraseña Trazza2026."
+    "as-merchant": "Regístrate como emprendedor"
   },
   "sign-up": {
     "title": "Crea tu cuenta",
