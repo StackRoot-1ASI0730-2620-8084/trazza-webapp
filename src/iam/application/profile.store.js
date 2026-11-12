@@ -3,10 +3,7 @@ import {ProfileApi} from "../infrastructure/profile-api.js";
 import {CarrierProfileAssembler} from "../infrastructure/carrier-profile.assembler.js";
 import {MerchantProfileAssembler} from "../infrastructure/merchant-profile.assembler.js";
 import {CarrierProfile} from "../domain/model/carrier-profile.entity.js";
-import {MerchantProfile} from "../domain/model/merchant-profile.entity.js";
 import {Vehicle} from "../domain/model/vehicle.entity.js";
-import {Dni} from "../domain/model/dni.value-object.js";
-import {Ruc} from "../domain/model/ruc.value-object.js";
 import {Phone} from "../domain/model/phone.value-object.js";
 import {LicensePlate} from "../domain/model/license-plate.value-object.js";
 import {LoadCapacity} from "../domain/model/load-capacity.value-object.js";
@@ -76,39 +73,6 @@ function getMerchantProfileByUserId(userId) {
  */
 function displayNameOf(userId) {
     return getCarrierProfileByUserId(userId)?.fullName ?? getMerchantProfileByUserId(userId)?.businessName ?? '';
-}
-
-/**
- * Creates the carrier or merchant profile of a newly registered user.
- *
- * @param {import('../domain/model/user.entity.js').User} user - Registered user.
- * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
- * @returns {Promise<CarrierProfile|MerchantProfile>} Created profile.
- */
-async function createProfileForUser(user, signUpCommand) {
-    if (user.isCarrier) {
-        const profile = new CarrierProfile({
-            userId: user.id,
-            fullName: signUpCommand.fullName,
-            dni: new Dni(signUpCommand.documentNumber),
-            phone: new Phone(signUpCommand.phone)
-        });
-        const response = await profileApi.createCarrierProfile(CarrierProfileAssembler.toResourceFromEntity(profile));
-        const created = CarrierProfileAssembler.toEntityFromResource(response.data);
-        state.carrierProfiles.push(created);
-        return created;
-    }
-    const profile = new MerchantProfile({
-        userId: user.id,
-        businessName: signUpCommand.businessName,
-        contactName: signUpCommand.fullName,
-        ruc: new Ruc(signUpCommand.documentNumber),
-        phone: new Phone(signUpCommand.phone)
-    });
-    const response = await profileApi.createMerchantProfile(MerchantProfileAssembler.toResourceFromEntity(profile));
-    const created = MerchantProfileAssembler.toEntityFromResource(response.data);
-    state.merchantProfiles.push(created);
-    return created;
 }
 
 /**
@@ -224,7 +188,6 @@ const profileStore = {
     getCarrierProfileByUserId,
     getMerchantProfileByUserId,
     displayNameOf,
-    createProfileForUser,
     addVehicle,
     updateVehicle,
     toggleVehicle,
