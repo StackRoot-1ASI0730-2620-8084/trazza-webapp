@@ -43,11 +43,12 @@ const isMerchant = computed(() => currentRole.value === 'merchant');
  * Stores the session of a user in memory and in the browser storage.
  *
  * @param {import('../domain/model/user.entity.js').User} user - Authenticated user.
+ * @param {string} token - Bearer token (JWT) issued by the Trazza Platform API.
  * @returns {void}
  */
-function startSession(user) {
+function startSession(user, token) {
     state.currentUser = user;
-    localStorage.setItem(SESSION_TOKEN_KEY, btoa(`${user.id}:${user.email.value}:${Date.now()}`));
+    localStorage.setItem(SESSION_TOKEN_KEY, token);
     localStorage.setItem(SESSION_USER_KEY, JSON.stringify(UserAssembler.toResourceFromEntity(user)));
 }
 
@@ -76,11 +77,12 @@ function restoreSession() {
 async function signIn(signInCommand) {
     state.processing = true;
     try {
-        const users = UserAssembler.toEntitiesFromResponse(await iamApi.signIn(signInCommand));
-        if (users.length !== 1) throw new Error('validation.invalid-credentials');
-        startSession(users[0]);
+        const response = await iamApi.signIn(signInCommand)
+            .catch(error => { throw [400, 401].includes(error.response?.status) ? new Error('validation.invalid-credentials') : error; });
+        const user = UserAssembler.toEntityFromResource(response.data);
+        startSession(user, response.data.token);
         state.errors = [];
-        return users[0];
+        return user;
     } catch (error) {
         state.errors.push(error);
         throw error;
@@ -99,12 +101,12 @@ async function signIn(signInCommand) {
 async function signUp(signUpCommand) {
     state.processing = true;
     try {
-        const existingUsers = await iamApi.findUsersByEmail(signUpCommand.email);
-        if (existingUsers.data.length > 0) throw new Error('validation.email-already-registered');
-        const response = await iamApi.signUp(signUpCommand);
+        const response = await iamApi.signUp(signUpCommand)
+            .catch(error => { throw error.response?.status === 409 ? new Error('validation.email-already-registered') : error; });
         const user = UserAssembler.toEntityFromResource(response.data);
+        // The session starts first so the profile is created with the new bearer token.
+        startSession(user, response.data.token);
         await useProfileStore().createProfileForUser(user, signUpCommand);
-        startSession(user);
         state.errors = [];
         return user;
     } catch (error) {

@@ -7,8 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
-    "server": "cd server && json-server --watch db.json --routes routes.json"
+    "preview": "vite preview"
   },
   "keywords": [
     "vue",
@@ -17,7 +16,6 @@
     "primeflex",
     "primeicons",
     "axios",
-    "json-server",
     "domain-driven-design",
     "logistics",
     "trazza"
@@ -34,7 +32,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.9",
-    "json-server": "^0.17.4",
     "vite": "^8.3.0"
   }
 }
