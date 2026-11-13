@@ -13,7 +13,10 @@
     "freight-requests": "Solicitudes de envío",
     "find-carriers": "Buscar transportistas",
     "shipment-tracking": "Seguimiento de envíos",
-    "shipment-history": "Historial de envíos"
+    "shipment-history": "Historial de envíos",
+    "plans": "Planes",
+    "subscriptions": "Mi suscripción",
+    "settlements": "Liquidaciones"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -117,7 +120,8 @@
     "status": "Estado",
     "suggestions": "Sugerencias",
     "vehicle": "Vehículo",
-    "weight": "Peso"
+    "weight": "Peso",
+    "trip": "Viaje"
   },
   "filters": {
     "all-statuses": "Todos los estados",
@@ -147,7 +151,14 @@
     "in_transit": "En tránsito",
     "delivered": "Entregado",
     "paid": "Pagado",
-    "failed": "Fallido"
+    "failed": "Fallido",
+    "past_due": "Pago vencido",
+    "refunded": "Reembolsado",
+    "marked_paid": "Marcado como pagado",
+    "settled": "Liquidado",
+    "paid_externally": "Pagado fuera de Trazza",
+    "waived": "Condonado",
+    "disputed": "En disputa"
   },
   "cargo-types": {
     "general": "General",
@@ -498,6 +509,59 @@
     "pay": "Pagar {price}",
     "limit-reached": "Alcanzaste el límite mensual de publicaciones del plan Gratuito."
   },
+  "plan": {
+    "title": "Planes de monitoreo",
+    "subtitle": "Elige cómo quieres monitorear tus camiones: solo la ruta, la carga con IoT o un paquete para tu flota.",
+    "per-month": "/ mes",
+    "per-truck-month": "/ camión / mes",
+    "min-trucks": "Desde {min} camiones",
+    "range-trucks": "De {min} a {max} camiones",
+    "includes-iot": "Incluye dispositivo IoT",
+    "subscribe": "Suscribirme",
+    "subscribe-to": "Suscribirse a {name}",
+    "choose-trucks": "Elige los camiones",
+    "monthly-total": "Total mensual",
+    "pay-simulated": "Pagar (simulado)",
+    "simulated-note": "El pago es simulado: no se realiza ningún cobro real.",
+    "subscribed": "Suscripción activada.",
+    "types": {
+      "route": "Monitoreo de ruta",
+      "iot_cargo": "Monitoreo de carga IoT",
+      "full": "Ruta y carga IoT"
+    }
+  },
+  "subscription": {
+    "title": "Mi suscripción",
+    "subtitle": "Revisa tu plan activo, el periodo actual y tus pagos.",
+    "empty": "Aún no tienes una suscripción. Revisa los",
+    "period": "Periodo actual",
+    "operation": "N.º de operación",
+    "renew": "Renovar",
+    "cancel": "Cancelar suscripción",
+    "confirm-cancel": "¿Seguro que quieres cancelar tu suscripción? Dejarás de monitorear tus camiones al terminar el periodo.",
+    "renewed": "Suscripción renovada.",
+    "cancelled": "Suscripción cancelada."
+  },
+  "settlement": {
+    "title": "Liquidaciones",
+    "subtitle": "Pagos de fletes entre emprendedores y transportistas, y compensaciones por cancelación.",
+    "freight": "Pagos de flete",
+    "empty": "No hay pagos de flete pendientes.",
+    "reference": "Referencia de pago",
+    "mark-paid": "Marcar como pagado",
+    "confirm": "Confirmar recepción",
+    "external-note": "El flete se paga fuera de Trazza (transferencia, Yape o Plin). Ingresa la referencia para que el transportista confirme la recepción.",
+    "marked-paid": "Pago registrado. El transportista debe confirmarlo.",
+    "confirmed": "Recepción del pago confirmada."
+  },
+  "compensation": {
+    "title": "Compensaciones por cancelación",
+    "rule": "Si un viaje confirmado se cancela, quien lo cancela compensa a la otra parte.",
+    "empty": "No hay compensaciones pendientes.",
+    "confirm-paid": "Confirmar pago",
+    "waive": "Condonar",
+    "dispute": "Disputar"
+  },
   "receipt": {
     "title": "Comprobante electrónico",
     "types": {
@@ -666,6 +730,7 @@
     "ruc-already-registered": "Este RUC ya está registrado.",
     "merchant-data-required": "Ingresa los datos de tu negocio.",
     "role-required": "Elige cómo usarás Trazza.",
-    "authentication-required": "Debes iniciar sesión."
+    "authentication-required": "Debes iniciar sesión.",
+    "plan-vehicle-count": "La cantidad de camiones no corresponde al plan elegido."
   }
 }
