@@ -17,7 +17,7 @@ export function useErrorHandler() {
     const describeError = error => {
         const key = error?.message ?? '';
         if (te(key)) return t(key);
-        if (error?.isAxiosError) return t('errors.network');
+        if (error?.isAxiosError) return t(error.response ? 'errors.server' : 'errors.network');
         return t('errors.unexpected');
     };
 

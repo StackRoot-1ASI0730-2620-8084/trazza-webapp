@@ -48,7 +48,8 @@
   },
   "errors": {
     "title": "Algo salió mal",
-    "network": "No pudimos conectar con el servidor de Trazza. Verifica que la API simulada esté en ejecución.",
+    "network": "No pudimos conectar con el servidor de Trazza. Revisa tu conexión e inténtalo de nuevo.",
+    "server": "El servidor de Trazza no pudo completar la solicitud. Es posible que esta función aún no esté disponible.",
     "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo."
   },
   "alerts": {

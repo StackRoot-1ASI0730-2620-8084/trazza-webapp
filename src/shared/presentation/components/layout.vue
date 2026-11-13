@@ -11,23 +11,38 @@ import useMatchmakingStore from "../../../matchmaking/application/matchmaking.st
 import useExecutionStore from "../../../execution/application/execution.store.js";
 import useBillingStore from "../../../billing/application/billing.store.js";
 import useReputationStore from "../../../reputation/application/reputation.store.js";
+import {useErrorHandler} from "../composables/use-error-handler.js";
 
 const { t } = useI18n();
 const route = useRoute();
 const iamStore = useIamStore();
+const { showError } = useErrorHandler();
 const drawer = ref(false);
 
 const isPublicRoute = computed(() => route.meta?.public === true);
 
 /**
  * Loads the data of every bounded context once a session is available.
+ * Endpoints that the platform does not expose yet (404 or 5xx) fail quietly;
+ * only a request without response (no connection) is reported to the user.
  */
-const loadContexts = () => {
-  useProfileStore().fetchProfiles();
-  useMatchmakingStore().fetchAll();
-  useExecutionStore().fetchShipments();
-  useBillingStore().fetchBilling();
-  useReputationStore().fetchRatings();
+const loadContexts = async () => {
+  const loads = [
+    [useProfileStore(), store => store.fetchProfiles()],
+    [useMatchmakingStore(), store => store.fetchAll()],
+    [useExecutionStore(), store => store.fetchShipments()],
+    [useBillingStore(), store => store.fetchBilling()],
+    [useReputationStore(), store => store.fetchRatings()]
+  ];
+  const errors = (await Promise.all(loads.map(async ([store, load]) => {
+    const previousCount = store.state.errors.length;
+    await load(store);
+    return store.state.errors.slice(previousCount);
+  }))).flat();
+
+  const connectionError = errors.find(error => error?.isAxiosError && !error.response);
+  if (connectionError) showError(connectionError);
+  else if (errors.length) console.warn('Some Trazza modules are not available yet:', errors.map(error => error?.message));
 };
 
 watch(() => iamStore.isSignedIn.value, signedIn => { if (signedIn) loadContexts(); }, { immediate: true });
