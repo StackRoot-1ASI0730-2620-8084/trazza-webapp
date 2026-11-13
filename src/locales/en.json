@@ -23,7 +23,8 @@
     "proposals": "Offers",
     "shipment-requests": "My shipments",
     "iot-devices": "IoT devices",
-    "trips": "Trips"
+    "trips": "Trips",
+    "points": "Points"
   },
   "menu": {
     "carrier-account": "Carrier account",
@@ -66,7 +67,8 @@
     "server": "The Trazza server could not complete the request. This feature may not be available yet.",
     "geolocation-unavailable": "This browser cannot share its location.",
     "geolocation-denied": "Location permission was denied.",
-    "invalid-request": "Some fields are invalid."
+    "invalid-request": "Some fields are invalid.",
+    "session-expired": "Your session expired. Sign in again."
   },
   "alerts": {
     "offers-waiting": "You have {count} offer(s) waiting for your answer",
@@ -217,7 +219,9 @@
     "in_review": "In review",
     "resolved": "Resolved",
     "available": "Available",
-    "loaned": "Loaned"
+    "loaned": "Loaned",
+    "maintenance": "Maintenance",
+    "retired": "Retired"
   },
   "cargo-types": {
     "general": "General",
@@ -329,7 +333,8 @@
     "empty": "No trucks yet.",
     "subtitle": "Trucks you use on your routes.",
     "title": "Trucks",
-    "volume-auto": "Leave empty to compute it from the dimensions."
+    "volume-auto": "Leave empty to compute it from the dimensions.",
+    "deactivated": "Truck deactivated."
   },
   "return-route": {
     "list-title": "My return routes",
@@ -633,9 +638,9 @@
     "empty": "No movements yet.",
     "reasons": {
       "adjustment": "Adjustment",
-      "rating-given": "Rating given",
+      "rating_given": "Rating given",
       "redemption": "Redemption",
-      "trip-completed": "Trip confirmed"
+      "trip_completed": "Trip confirmed"
     },
     "redeem": "Redeem points",
     "redeemed": "Points redeemed.",
@@ -854,7 +859,10 @@
     "weight-positive": "The weight must be greater than 0.",
     "incident-type": "Choose the incident type.",
     "evidence-required": "Write the file key.",
-    "resolution-required": "Write the resolution."
+    "resolution-required": "Write the resolution.",
+    "points-insufficient": "You do not have enough points.",
+    "points-positive": "Write a positive number of points.",
+    "score-range": "The score goes from 1 to 5."
   },
   "plan": {
     "title": "Monitoring plans",
@@ -907,7 +915,12 @@
     "empty": "There are no pending compensations.",
     "confirm-paid": "Confirm payment",
     "waive": "Waive",
-    "dispute": "Dispute"
+    "dispute": "Dispute",
+    "done": {
+      "confirm-paid": "Compensation marked as received.",
+      "dispute": "Compensation disputed.",
+      "waive": "Compensation waived."
+    }
   },
   "driver": {
     "add": "Add driver",
@@ -919,14 +932,18 @@
     "sex-none": "Prefer not to say",
     "sex-x": "Other",
     "subtitle": "People who drive your trucks.",
-    "title": "Drivers"
+    "title": "Drivers",
+    "deactivated": "Driver deactivated.",
+    "saved": "Driver saved."
   },
   "saved-address": {
     "add": "Add address",
     "empty": "No saved addresses.",
     "label-placeholder": "Warehouse, Home…",
     "subtitle": "Places you use often.",
-    "title": "Saved addresses"
+    "title": "Saved addresses",
+    "deleted": "Address deleted.",
+    "saved": "Address saved."
   },
   "chat": {
     "closed": "The chat is closed. Messages are deleted when the trip ends.",

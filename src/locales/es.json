@@ -23,7 +23,8 @@
     "proposals": "Ofertas",
     "shipment-requests": "Mis envíos",
     "iot-devices": "Dispositivos IoT",
-    "trips": "Viajes"
+    "trips": "Viajes",
+    "points": "Puntos"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -66,7 +67,8 @@
     "server": "El servidor de Trazza no pudo completar la solicitud. Es posible que esta función aún no esté disponible.",
     "geolocation-unavailable": "Este navegador no puede compartir su ubicación.",
     "geolocation-denied": "Se negó el permiso de ubicación.",
-    "invalid-request": "Algunos campos no son válidos."
+    "invalid-request": "Algunos campos no son válidos.",
+    "session-expired": "Tu sesión expiró. Inicia sesión de nuevo."
   },
   "alerts": {
     "offers-waiting": "Tienes {count} oferta(s) esperando tu respuesta",
@@ -217,7 +219,9 @@
     "in_review": "En revisión",
     "resolved": "Resuelta",
     "available": "Disponible",
-    "loaned": "Prestado"
+    "loaned": "Prestado",
+    "maintenance": "Mantenimiento",
+    "retired": "Retirado"
   },
   "cargo-types": {
     "general": "General",
@@ -329,7 +333,8 @@
     "empty": "Aún no hay camiones.",
     "subtitle": "Camiones que usas en tus rutas.",
     "title": "Camiones",
-    "volume-auto": "Déjalo vacío para calcularlo con las medidas."
+    "volume-auto": "Déjalo vacío para calcularlo con las medidas.",
+    "deactivated": "Camión desactivado."
   },
   "return-route": {
     "list-title": "Mis rutas de retorno",
@@ -633,9 +638,9 @@
     "empty": "Aún no hay movimientos.",
     "reasons": {
       "adjustment": "Ajuste",
-      "rating-given": "Calificación dada",
+      "rating_given": "Calificación dada",
       "redemption": "Canje",
-      "trip-completed": "Viaje confirmado"
+      "trip_completed": "Viaje confirmado"
     },
     "redeem": "Canjear puntos",
     "redeemed": "Puntos canjeados.",
@@ -854,7 +859,10 @@
     "weight-positive": "El peso debe ser mayor que 0.",
     "incident-type": "Elige el tipo de incidencia.",
     "evidence-required": "Escribe la clave del archivo.",
-    "resolution-required": "Escribe la resolución."
+    "resolution-required": "Escribe la resolución.",
+    "points-insufficient": "No tienes suficientes puntos.",
+    "points-positive": "Escribe una cantidad de puntos positiva.",
+    "score-range": "La puntuación va de 1 a 5."
   },
   "plan": {
     "title": "Planes de monitoreo",
@@ -907,7 +915,12 @@
     "empty": "No hay compensaciones pendientes.",
     "confirm-paid": "Confirmar pago",
     "waive": "Condonar",
-    "dispute": "Disputar"
+    "dispute": "Disputar",
+    "done": {
+      "confirm-paid": "Compensación marcada como recibida.",
+      "dispute": "Compensación en disputa.",
+      "waive": "Compensación condonada."
+    }
   },
   "driver": {
     "add": "Agregar conductor",
@@ -919,14 +932,18 @@
     "sex-none": "Prefiere no decirlo",
     "sex-x": "Otro",
     "subtitle": "Personas que manejan tus camiones.",
-    "title": "Conductores"
+    "title": "Conductores",
+    "deactivated": "Conductor desactivado.",
+    "saved": "Conductor guardado."
   },
   "saved-address": {
     "add": "Agregar dirección",
     "empty": "No hay direcciones guardadas.",
     "label-placeholder": "Almacén, Casa…",
     "subtitle": "Lugares que usas seguido.",
-    "title": "Direcciones guardadas"
+    "title": "Direcciones guardadas",
+    "deleted": "Dirección eliminada.",
+    "saved": "Dirección guardada."
   },
   "chat": {
     "closed": "El chat está cerrado. Los mensajes se borran cuando termina el viaje.",
