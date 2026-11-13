@@ -1,134 +1,51 @@
 import {computed, reactive} from "vue";
 import {ReputationApi} from "../infrastructure/reputation-api.js";
-import {RatingAssembler} from "../infrastructure/rating.assembler.js";
-import {Rating} from "../domain/model/rating.entity.js";
-import {Score} from "../domain/model/score.value-object.js";
-import {RatingTarget} from "../domain/model/rating-target.value-object.js";
-import useIamStore from "../../iam/application/iam.store.js";
+import {LoyaltyAccount, Rating} from "../domain/model/reputation.entities.js";
 
-const reputationApi = new ReputationApi();
+const api = new ReputationApi();
 
-/**
- * Reactive state of the Loyalty & Reputation bounded context.
- *
- * @type {{ratings: Rating[], loaded: boolean, errors: Error[]}}
- */
 const state = reactive({
-    ratings: [],
-    loaded: false,
-    errors: []
+    received: [],
+    given: [],
+    loyalty: new LoyaltyAccount(),
+    loaded: false
 });
 
-/** @returns {?number} Identifier of the signed-in user. */
-const currentUserId = () => useIamStore().currentUserId.value;
+const averageScore = computed(() => state.received.length
+    ? state.received.reduce((total, rating) => total + rating.score, 0) / state.received.length
+    : null);
 
-/** @type {import('vue').ComputedRef<Rating[]>} Ratings received by the signed-in user, newest first. */
-const myReceivedRatings = computed(() => ratingsReceivedBy(currentUserId()));
+const toRating = resource => new Rating(resource);
 
-/** @type {import('vue').ComputedRef<Rating[]>} Ratings given by the signed-in user, newest first. */
-const myGivenRatings = computed(() => state.ratings
-    .filter(rating => rating.raterId === currentUserId())
-    .sort((a, b) => b.createdAt.localeCompare(a.createdAt)));
-
-/**
- * Loads every rating.
- *
- * @returns {Promise<void>}
- */
 async function fetchRatings() {
-    try {
-        state.ratings = RatingAssembler.toEntitiesFromResponse(await reputationApi.getRatings());
-        state.loaded = true;
-        state.errors = [];
-    } catch (error) {
-        state.errors.push(error);
-    }
+    const [received, given] = await Promise.all([api.listReceived(), api.listGiven()]);
+    state.received = received.data.map(toRating);
+    state.given = given.data.map(toRating);
+    state.loaded = true;
 }
 
-/**
- * @param {number} userId - User identifier.
- * @returns {Rating[]} Ratings received by the user, newest first.
- */
-function ratingsReceivedBy(userId) {
-    return state.ratings
-        .filter(rating => rating.target.userId === userId)
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+async function fetchLoyalty() {
+    state.loyalty = new LoyaltyAccount((await api.getPoints()).data);
 }
 
-/**
- * Calculates the reputation of a user.
- *
- * @param {number} userId - User identifier.
- * @returns {{average: number, count: number, distribution: number[]}} Average stars, number of ratings and count per star (index 0 = 1 star).
- */
-function summaryFor(userId) {
-    const received = ratingsReceivedBy(userId);
-    const distribution = [0, 0, 0, 0, 0];
-    received.forEach(rating => distribution[rating.score.value - 1]++);
-    const total = received.reduce((sum, rating) => sum + rating.score.value, 0);
-    return { average: received.length ? Math.round(total / received.length * 10) / 10 : 0, count: received.length, distribution };
+const hasRated = tripId => state.given.some(rating => rating.tripId === tripId);
+
+async function rateTrip({ tripId, score, comment }) {
+    if (!Number.isInteger(score) || score < Rating.MIN_SCORE || score > Rating.MAX_SCORE) throw new Error('validation.score-range');
+    const rating = toRating((await api.rate({ tripId, score, comment: (comment ?? '').trim() || null })).data);
+    state.given.unshift(rating);
+    await fetchLoyalty();
+    return rating;
 }
 
-/**
- * @param {number} shipmentId - Shipment identifier.
- * @param {number} raterId - Rater identifier.
- * @returns {Rating|undefined} Rating given by the rater for the shipment.
- */
-function ratingForShipmentBy(shipmentId, raterId) {
-    return state.ratings.find(rating => rating.shipmentId === shipmentId && rating.raterId === raterId);
+async function redeemPoints(points) {
+    if (!Number.isInteger(points) || points <= 0) throw new Error('validation.points-positive');
+    if (points > state.loyalty.balance) throw new Error('validation.points-insufficient');
+    state.loyalty = new LoyaltyAccount((await api.redeem(points)).data);
 }
 
-/**
- * Executes the rate-the-counterpart use case after a delivered shipment.
- *
- * @param {Object} params - Rating data.
- * @param {import('../../execution/domain/model/shipment.entity.js').Shipment} params.shipment - Delivered shipment.
- * @param {number} params.score - Stars from 1 to 5.
- * @param {string[]} [params.tags=[]] - Highlight tags.
- * @param {string} [params.comment=''] - Optional comment.
- * @returns {Promise<Rating>} Created rating.
- * @throws {Error} When the shipment was not delivered or it was already rated.
- */
-async function submitRating({ shipment, score, tags = [], comment = '' }) {
-    const iamStore = useIamStore();
-    const raterId = iamStore.currentUserId.value;
-    if (!shipment.status.isDelivered) throw new Error('validation.shipment-not-delivered');
-    if (!shipment.involves(raterId)) throw new Error('validation.not-a-party');
-    if (ratingForShipmentBy(shipment.id, raterId)) throw new Error('validation.already-rated');
-    const raterIsCarrier = shipment.carrierId === raterId;
-    const rating = new Rating({
-        shipmentId: shipment.id,
-        raterId,
-        raterName: raterIsCarrier ? shipment.carrierName : shipment.merchantName,
-        target: raterIsCarrier
-            ? new RatingTarget({ userId: shipment.merchantId, role: 'merchant', name: shipment.merchantName })
-            : new RatingTarget({ userId: shipment.carrierId, role: 'carrier', name: shipment.carrierName }),
-        score: new Score(score),
-        tags,
-        comment
-    });
-    const response = await reputationApi.createRating(RatingAssembler.toResourceFromEntity(rating));
-    const created = RatingAssembler.toEntityFromResource(response.data);
-    state.ratings.push(created);
-    return created;
-}
+const reputationStore = { state, averageScore, fetchRatings, fetchLoyalty, hasRated, rateTrip, redeemPoints };
 
-const reputationStore = {
-    state,
-    myReceivedRatings,
-    myGivenRatings,
-    fetchRatings,
-    ratingsReceivedBy,
-    summaryFor,
-    ratingForShipmentBy,
-    submitRating
-};
-
-/**
- * Application service store for the Loyalty & Reputation bounded context.
- *
- * @returns {typeof reputationStore} Store state, getters and actions.
- */
 const useReputationStore = () => reputationStore;
 
 export default useReputationStore;
