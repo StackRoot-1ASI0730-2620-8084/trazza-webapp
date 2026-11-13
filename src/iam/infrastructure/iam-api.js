@@ -44,6 +44,16 @@ export class IamApi extends BaseApi {
     }
 
     /**
+     * Revokes the refresh token of the session.
+     *
+     * @param {string} refreshToken - Refresh token to revoke.
+     * @returns {Promise<import('axios').AxiosResponse>} Empty response.
+     */
+    signOut(refreshToken) {
+        return this.http.post(`${authenticationEndpointPath}/sign-out`, { refreshToken });
+    }
+
+    /**
      * @returns {Promise<import('axios').AxiosResponse>} Response with the account of the signed-in user.
      */
     getCurrentUser() {

@@ -1,16 +1,10 @@
 import {computed, reactive} from "vue";
 import {IamApi} from "../infrastructure/iam-api.js";
 import {UserAssembler} from "../infrastructure/user.assembler.js";
-import {SESSION_REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "../infrastructure/iam.interceptor.js";
+import {sessionStorage} from "../infrastructure/session.storage.js";
 import {Phone} from "../domain/model/phone.value-object.js";
 
 const iamApi = new IamApi();
-
-/**
- * Key used to persist the signed-in user resource in the browser storage.
- * @type {string}
- */
-const SESSION_USER_KEY = 'trazza.session.user';
 
 /**
  * Reactive state of the IAM bounded context.
@@ -39,7 +33,22 @@ const isCarrier = computed(() => currentRole.value === 'carrier');
 const isMerchant = computed(() => currentRole.value === 'merchant');
 
 /**
- * Stores the session of a user in memory and in the browser storage.
+ * Applies the account stored in the session to the state. The session storage calls it on sign-in, on every
+ * refresh of the tokens and on sign-out (with null).
+ *
+ * @param {?Object} resource - Account resource, or null when the session ends.
+ * @returns {void}
+ */
+function applyUser(resource) {
+    try {
+        state.currentUser = resource ? UserAssembler.toEntityFromResource(resource) : null;
+    } catch (error) {
+        state.currentUser = null;
+    }
+}
+
+/**
+ * Stores the session of a user in the browser storage.
  *
  * @param {Object} session - Session resource issued by the Trazza Platform API.
  * @param {string} session.accessToken - Bearer token (JWT).
@@ -48,12 +57,8 @@ const isMerchant = computed(() => currentRole.value === 'merchant');
  * @returns {import('../domain/model/user.entity.js').User} Authenticated user.
  */
 function startSession(session) {
-    const user = UserAssembler.toEntityFromResource(session.user);
-    state.currentUser = user;
-    localStorage.setItem(SESSION_TOKEN_KEY, session.accessToken);
-    localStorage.setItem(SESSION_REFRESH_TOKEN_KEY, session.refreshToken);
-    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(UserAssembler.toResourceFromEntity(user)));
-    return user;
+    sessionStorage.save(session);
+    return state.currentUser;
 }
 
 /**
@@ -69,18 +74,13 @@ function toApiError(error) {
 }
 
 /**
- * Restores a previous session from the browser storage.
+ * Restores a previous session from the browser storage and follows its changes.
  *
  * @returns {void}
  */
 function restoreSession() {
-    const serializedUser = localStorage.getItem(SESSION_USER_KEY);
-    if (!serializedUser || !localStorage.getItem(SESSION_TOKEN_KEY)) return;
-    try {
-        state.currentUser = UserAssembler.toEntityFromResource(JSON.parse(serializedUser));
-    } catch (error) {
-        signOut();
-    }
+    sessionStorage.onChange(applyUser);
+    applyUser(sessionStorage.accessToken ? sessionStorage.user : null);
 }
 
 /**
@@ -138,22 +138,24 @@ async function signUp(signUpCommand) {
 async function updateCurrentUser({ fullName, phone }) {
     const user = state.currentUser;
     user.updateContact({ fullName, phone: new Phone(phone) });
-    const resource = UserAssembler.toResourceFromEntity(user);
-    await iamApi.updateUser(resource);
-    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(resource));
+    const response = await iamApi.updateUser(UserAssembler.toResourceFromEntity(user));
+    sessionStorage.saveUser(response.data);
 }
 
 /**
- * Clears the active session and local authentication artifacts.
+ * Revokes the refresh token in the API (best effort) and clears the local session.
  *
- * @returns {void}
+ * @returns {Promise<void>}
  */
-function signOut() {
-    state.currentUser = null;
+async function signOut() {
+    const refreshToken = sessionStorage.refreshToken;
     state.errors = [];
-    localStorage.removeItem(SESSION_TOKEN_KEY);
-    localStorage.removeItem(SESSION_REFRESH_TOKEN_KEY);
-    localStorage.removeItem(SESSION_USER_KEY);
+    try {
+        if (refreshToken) await iamApi.signOut(refreshToken);
+    } catch (error) {
+        // The local session is cleared anyway.
+    }
+    sessionStorage.clear();
 }
 
 restoreSession();

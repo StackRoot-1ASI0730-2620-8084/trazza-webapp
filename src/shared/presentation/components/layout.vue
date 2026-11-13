@@ -1,6 +1,6 @@
 <script setup>
 import {computed, ref, watch} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import SideMenu from "./side-menu.vue";
 import TopBar from "./top-bar.vue";
@@ -15,6 +15,7 @@ import {useErrorHandler} from "../composables/use-error-handler.js";
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const iamStore = useIamStore();
 const { showError } = useErrorHandler();
 const drawer = ref(false);
@@ -49,7 +50,11 @@ const loadContexts = async () => {
   else if (errors.length) console.warn('Some Trazza modules are not available yet:', errors.map(error => error?.message));
 };
 
-watch(() => iamStore.isSignedIn.value, signedIn => { if (signedIn) loadContexts(); }, { immediate: true });
+// When the session ends (sign-out, or a refresh token that is no longer valid) the user returns to sign-in.
+watch(() => iamStore.isSignedIn.value, signedIn => {
+  if (signedIn) loadContexts();
+  else if (!isPublicRoute.value) router.push({ name: 'iam-sign-in' });
+}, { immediate: true });
 </script>
 
 <template>
