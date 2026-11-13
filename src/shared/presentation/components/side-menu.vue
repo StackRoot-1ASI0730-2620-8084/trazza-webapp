@@ -17,8 +17,10 @@ const carrierItems = [
   { label: 'option.active-trip',      icon: 'pi pi-truck',         to: { name: 'execution-active-trip' } },
   { label: 'option.trip-history',     icon: 'pi pi-history',       to: { name: 'execution-trip-history' } },
   { label: 'option.vehicles',         icon: 'pi pi-car',           to: { name: 'iam-vehicles' } },
+  { label: 'option.drivers',          icon: 'pi pi-id-card',       to: { name: 'iam-drivers' } },
   { label: 'option.ratings',          icon: 'pi pi-star',          to: { name: 'reputation-ratings' } },
   { label: 'option.plan-billing',     icon: 'pi pi-credit-card',   to: { name: 'billing-plans' } },
+  { label: 'option.saved-addresses',  icon: 'pi pi-bookmark',      to: { name: 'iam-saved-addresses' } },
   { label: 'option.profile',          icon: 'pi pi-user',          to: { name: 'iam-profile' } }
 ];
 
@@ -31,6 +33,7 @@ const merchantItems = [
   { label: 'option.shipment-history',   icon: 'pi pi-history',     to: { name: 'execution-shipment-history' } },
   { label: 'option.ratings',            icon: 'pi pi-star',        to: { name: 'reputation-ratings' } },
   { label: 'option.plan-billing',       icon: 'pi pi-credit-card', to: { name: 'billing-settlements' } },
+  { label: 'option.saved-addresses',    icon: 'pi pi-bookmark',    to: { name: 'iam-saved-addresses' } },
   { label: 'option.profile',            icon: 'pi pi-user',        to: { name: 'iam-profile' } }
 ];
 

@@ -1,52 +1,75 @@
 import {computed, reactive} from "vue";
-import {BaseApi} from "../../shared/infrastructure/base-api.js";
+import {IamApi} from "../infrastructure/iam-api.js";
+import {IamAssembler} from "../infrastructure/iam.assembler.js";
 
-// Provisional fleet store until the IAM fleet module is pushed; it only reads the carrier vehicles.
-const vehiclesEndpointPath = import.meta.env.VITE_VEHICLES_ENDPOINT_PATH ?? '/vehicles';
-
-class FleetApi extends BaseApi {
-    getVehicles() { return this.http.get(vehiclesEndpointPath); }
-}
-
-const api = new FleetApi();
+const iamApi = new IamApi();
 
 /**
- * Reactive state of the signed-in carrier fleet.
- *
- * @type {{vehicles: Object[], errors: Error[]}}
+ * Reactive state of the carrier's fleet (trucks and drivers) and of the user's saved addresses.
  */
 const state = reactive({
     vehicles: [],
-    errors: []
+    drivers: [],
+    savedAddresses: [],
+    loaded: false
 });
 
-const toVehicle = resource => ({
-    id: resource.id,
-    plate: resource.plate,
-    model: resource.model,
-    active: resource.isActive,
-    label: `${resource.model} · ${resource.plate}`
-});
+const activeVehicles = computed(() => state.vehicles.filter(vehicle => vehicle.isActive));
+const activeDrivers = computed(() => state.drivers.filter(driver => driver.isActive));
 
-/** @type {import('vue').ComputedRef<Object[]>} Vehicles that can be subscribed to a plan. */
-const activeVehicles = computed(() => state.vehicles.filter(vehicle => vehicle.active));
-
-/**
- * Loads the vehicles of the signed-in carrier. Users without a fleet get an empty list.
- *
- * @returns {Promise<void>}
- */
 async function fetchFleet() {
-    try {
-        state.vehicles = (await api.getVehicles()).data.map(toVehicle);
-    } catch (error) {
-        state.vehicles = [];
-        state.errors.push(error);
-    }
+    const [vehicles, drivers] = await Promise.all([iamApi.vehicles.getAll(), iamApi.drivers.getAll()]);
+    state.vehicles = vehicles.data.map(IamAssembler.toVehicle);
+    state.drivers = drivers.data.map(IamAssembler.toDriver);
+    state.loaded = true;
 }
 
-const fleetStore = {state, activeVehicles, fetchFleet};
+async function fetchSavedAddresses() {
+    state.savedAddresses = (await iamApi.savedAddresses.getAll()).data.map(IamAssembler.toSavedAddress);
+}
 
+const findVehicle = id => state.vehicles.find(vehicle => vehicle.id === id) ?? null;
+
+async function saveVehicle(vehicle) {
+    const resource = IamAssembler.toVehicleResource(vehicle);
+    const response = vehicle.id ? await iamApi.vehicles.update(vehicle.id, resource) : await iamApi.vehicles.create(resource);
+    await fetchFleet();
+    return IamAssembler.toVehicle(response.data);
+}
+
+async function deactivateVehicle(vehicle) {
+    await iamApi.vehicles.delete(vehicle.id);
+    await fetchFleet();
+}
+
+async function saveDriver(driver) {
+    const resource = IamAssembler.toDriverResource(driver);
+    if (driver.id) await iamApi.drivers.update(driver.id, resource);
+    else await iamApi.drivers.create(resource);
+    await fetchFleet();
+}
+
+async function deactivateDriver(driver) {
+    await iamApi.drivers.delete(driver.id);
+    await fetchFleet();
+}
+
+async function createSavedAddress({ label, address, district, latitude, longitude }) {
+    await iamApi.savedAddresses.create({ label, address, district: district || null, latitude, longitude });
+    await fetchSavedAddresses();
+}
+
+async function deleteSavedAddress(savedAddress) {
+    await iamApi.savedAddresses.delete(savedAddress.id);
+    await fetchSavedAddresses();
+}
+
+const fleetStore = {
+    state, activeVehicles, activeDrivers, fetchFleet, fetchSavedAddresses, findVehicle, saveVehicle, deactivateVehicle,
+    saveDriver, deactivateDriver, createSavedAddress, deleteSavedAddress
+};
+
+/** @returns {typeof fleetStore} Application service store of the fleet and saved addresses. */
 const useFleetStore = () => fleetStore;
 
 export default useFleetStore;

@@ -16,7 +16,9 @@
     "shipment-history": "Shipment History",
     "plans": "Plans",
     "subscriptions": "My subscription",
-    "settlements": "Settlements"
+    "settlements": "Settlements",
+    "drivers": "Drivers",
+    "saved-addresses": "Saved addresses"
   },
   "menu": {
     "carrier-account": "Carrier account",
@@ -44,7 +46,8 @@
     "edit": "Edit",
     "reject": "Reject",
     "save-changes": "Save changes",
-    "send": "Send"
+    "send": "Send",
+    "save": "Save"
   },
   "messages": {
     "done": "Done"
@@ -99,7 +102,14 @@
     "expiry": "Expiry",
     "receipt-type": "Receipt",
     "comment": "Comment",
-    "business-type": "Type of business"
+    "business-type": "Type of business",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "experience": "Experience",
+    "label": "Name",
+    "sex": "Sex",
+    "latitude": "Latitude",
+    "longitude": "Longitude"
   },
   "columns": {
     "actions": "Actions",
@@ -161,7 +171,8 @@
     "settled": "Settled",
     "paid_externally": "Paid outside Trazza",
     "waived": "Waived",
-    "disputed": "Disputed"
+    "disputed": "Disputed",
+    "inactive": "Inactive"
   },
   "cargo-types": {
     "general": "General",
@@ -761,5 +772,24 @@
     "confirm-paid": "Confirm payment",
     "waive": "Waive",
     "dispute": "Dispute"
+  },
+  "driver": {
+    "add": "Add driver",
+    "deactivate": "Deactivate",
+    "edit": "Edit driver",
+    "empty": "No drivers yet.",
+    "sex-f": "Female",
+    "sex-m": "Male",
+    "sex-none": "Prefer not to say",
+    "sex-x": "Other",
+    "subtitle": "People who drive your trucks.",
+    "title": "Drivers"
+  },
+  "saved-address": {
+    "add": "Add address",
+    "empty": "No saved addresses.",
+    "label-placeholder": "Warehouse, Home…",
+    "subtitle": "Places you use often.",
+    "title": "Saved addresses"
   }
 }

@@ -1,7 +1,11 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
+import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
 const usersEndpointPath = import.meta.env.VITE_USERS_ENDPOINT_PATH;
 const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_PATH;
+const vehiclesEndpointPath = import.meta.env.VITE_VEHICLES_ENDPOINT_PATH ?? '/vehicles';
+const driversEndpointPath = import.meta.env.VITE_DRIVERS_ENDPOINT_PATH ?? '/drivers';
+const savedAddressesEndpointPath = import.meta.env.VITE_SAVED_ADDRESSES_ENDPOINT_PATH ?? '/saved-addresses';
 
 /**
  * Infrastructure gateway for the IAM endpoints.
@@ -10,6 +14,14 @@ const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_
  * @extends BaseApi
  */
 export class IamApi extends BaseApi {
+    /** Creates the endpoint clients of the carrier fleet and of the saved addresses. */
+    constructor() {
+        super();
+        this.vehicles = new BaseEndpoint(this, vehiclesEndpointPath);
+        this.drivers = new BaseEndpoint(this, driversEndpointPath);
+        this.savedAddresses = new BaseEndpoint(this, savedAddressesEndpointPath);
+    }
+
     /**
      * Authenticates a user against the Trazza Platform API.
      *

@@ -16,7 +16,9 @@
     "shipment-history": "Historial de envíos",
     "plans": "Planes",
     "subscriptions": "Mi suscripción",
-    "settlements": "Liquidaciones"
+    "settlements": "Liquidaciones",
+    "drivers": "Conductores",
+    "saved-addresses": "Direcciones guardadas"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -44,7 +46,8 @@
     "edit": "Editar",
     "reject": "Rechazar",
     "save-changes": "Guardar cambios",
-    "send": "Enviar"
+    "send": "Enviar",
+    "save": "Guardar"
   },
   "messages": {
     "done": "Listo"
@@ -99,7 +102,14 @@
     "expiry": "Vencimiento",
     "receipt-type": "Comprobante",
     "comment": "Comentario",
-    "business-type": "Tipo de negocio"
+    "business-type": "Tipo de negocio",
+    "address": "Dirección",
+    "coordinates": "Coordenadas",
+    "experience": "Experiencia",
+    "label": "Nombre",
+    "sex": "Sexo",
+    "latitude": "Latitud",
+    "longitude": "Longitud"
   },
   "columns": {
     "actions": "Acciones",
@@ -161,7 +171,8 @@
     "settled": "Liquidado",
     "paid_externally": "Pagado fuera de Trazza",
     "waived": "Condonado",
-    "disputed": "En disputa"
+    "disputed": "En disputa",
+    "inactive": "Inactivo"
   },
   "cargo-types": {
     "general": "General",
@@ -761,5 +772,24 @@
     "confirm-paid": "Confirmar pago",
     "waive": "Condonar",
     "dispute": "Disputar"
+  },
+  "driver": {
+    "add": "Agregar conductor",
+    "deactivate": "Desactivar",
+    "edit": "Editar conductor",
+    "empty": "Aún no hay conductores.",
+    "sex-f": "Femenino",
+    "sex-m": "Masculino",
+    "sex-none": "Prefiere no decirlo",
+    "sex-x": "Otro",
+    "subtitle": "Personas que manejan tus camiones.",
+    "title": "Conductores"
+  },
+  "saved-address": {
+    "add": "Agregar dirección",
+    "empty": "No hay direcciones guardadas.",
+    "label-placeholder": "Almacén, Casa…",
+    "subtitle": "Lugares que usas seguido.",
+    "title": "Direcciones guardadas"
   }
 }
