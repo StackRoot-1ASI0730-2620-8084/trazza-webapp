@@ -1,31 +1,18 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
-import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
-const ratingsEndpointPath = import.meta.env.VITE_RATINGS_ENDPOINT_PATH;
+const ratingsPath = import.meta.env.VITE_RATINGS_ENDPOINT_PATH ?? '/ratings';
+const loyaltyPath = import.meta.env.VITE_LOYALTY_ENDPOINT_PATH ?? '/loyalty';
 
-/**
- * Infrastructure gateway for the Loyalty & Reputation bounded context endpoints.
- *
- * @class ReputationApi
- * @extends BaseApi
- */
 export class ReputationApi extends BaseApi {
-    /** Creates the endpoint client for ratings. */
-    constructor() {
-        super();
-        this._ratingsEndpoint = new BaseEndpoint(this, ratingsEndpointPath);
-    }
+    rate(resource) { return this.http.post(ratingsPath, resource); }
 
-    /** @returns {Promise<import('axios').AxiosResponse>} Response with every rating. */
-    getRatings() {
-        return this._ratingsEndpoint.getAll();
-    }
+    listReceived() { return this.http.get(`${ratingsPath}/received`); }
 
-    /**
-     * @param {Object} resource - Rating resource.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created rating.
-     */
-    createRating(resource) {
-        return this._ratingsEndpoint.create(resource);
-    }
+    listGiven() { return this.http.get(`${ratingsPath}/given`); }
+
+    getSummary(userId) { return this.http.get(`${ratingsPath}/summary/${userId}`); }
+
+    getPoints() { return this.http.get(`${loyaltyPath}/points`); }
+
+    redeem(points) { return this.http.post(`${loyaltyPath}/redemptions`, { points }); }
 }
