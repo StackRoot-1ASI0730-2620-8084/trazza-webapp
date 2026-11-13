@@ -18,7 +18,10 @@
     "subscriptions": "Mi suscripción",
     "settlements": "Liquidaciones",
     "drivers": "Conductores",
-    "saved-addresses": "Direcciones guardadas"
+    "saved-addresses": "Direcciones guardadas",
+    "open-shipments": "Envíos abiertos",
+    "proposals": "Ofertas",
+    "shipment-requests": "Mis envíos"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -48,7 +51,8 @@
     "reject": "Rechazar",
     "save-changes": "Guardar cambios",
     "send": "Enviar",
-    "save": "Guardar"
+    "save": "Guardar",
+    "open": "Abrir"
   },
   "messages": {
     "done": "Listo"
@@ -116,7 +120,17 @@
     "max-load": "Carga máxima (kg)",
     "model": "Modelo",
     "volume": "Volumen (m³)",
-    "width": "Ancho (m)"
+    "width": "Ancho (m)",
+    "delivery": "Entrega",
+    "departure": "Salida",
+    "destination": "Destino",
+    "driver": "Conductor",
+    "max-shipments": "Envíos por viaje",
+    "origin": "Origen",
+    "pickup": "Recojo",
+    "pickup-from": "Recojo desde",
+    "pickup-until": "Recojo hasta",
+    "reason": "Motivo"
   },
   "columns": {
     "actions": "Acciones",
@@ -141,7 +155,11 @@
     "weight": "Peso",
     "points": "Puntos",
     "reason": "Motivo",
-    "trip": "Viaje"
+    "trip": "Viaje",
+    "cargo": "Carga",
+    "departure": "Salida",
+    "shipment": "Envío",
+    "slots": "Cupos"
   },
   "filters": {
     "all-statuses": "Todos los estados",
@@ -181,7 +199,12 @@
     "disputed": "En disputa",
     "inactive": "Inactivo",
     "submitted": "Enviado",
-    "validated": "Validado"
+    "validated": "Validado",
+    "published": "Publicada",
+    "full": "Llena",
+    "in_progress": "En curso",
+    "completed": "Completada",
+    "expired": "Vencida"
   },
   "cargo-types": {
     "general": "General",
@@ -312,7 +335,13 @@
     "close": "Cerrar ruta",
     "confirm-close": "¿Cerrar la ruta {route}? Las ofertas abiertas también se cerrarán.",
     "view-suggestions": "Ver sugerencias",
-    "empty": "Aún no has publicado rutas de retorno."
+    "empty": "Aún no has publicado rutas de retorno.",
+    "cancel": "Cancelar ruta",
+    "confirm-cancel": "¿Cancelar la ruta {route}?",
+    "free": "libres",
+    "max-shipments-hint": "Un camión lleva como máximo 2 envíos por viaje.",
+    "no-driver": "Sin conductor asignado",
+    "cancelled": "Ruta cancelada."
   },
   "load-suggestions": {
     "title": "Cargas sugeridas",
@@ -365,7 +394,14 @@
       "matched": "Match confirmado con {merchant}. Revisa tu viaje activo.",
       "rejected": "La oferta fue rechazada.",
       "closed": "Esta oferta se cerró."
-    }
+    },
+    "choose-route": "Elige una de tus rutas abiertas",
+    "make": "Ofertar",
+    "rate": "Tu tarifa",
+    "route": "Ruta",
+    "send": "Enviar oferta",
+    "single-offer-hint": "Puedes hacer una sola oferta. El comerciante la acepta o la rechaza, no hay contraofertas.",
+    "title": "Oferta para este envío"
   },
   "offers": {
     "title": "Ofertas",
@@ -745,7 +781,17 @@
     "merchant-data-required": "Ingresa los datos de tu negocio.",
     "role-required": "Elige cómo usarás Trazza.",
     "authentication-required": "Debes iniciar sesión.",
-    "plan-vehicle-count": "La cantidad de camiones no corresponde al plan elegido."
+    "plan-vehicle-count": "La cantidad de camiones no corresponde al plan elegido.",
+    "address-required": "Escribe la dirección.",
+    "departure-future": "La salida debe ser en el futuro.",
+    "description-required": "Escribe una descripción.",
+    "max-shipments": "Un viaje lleva 1 o 2 envíos.",
+    "pickup-window": "El fin del recojo debe ser después del inicio.",
+    "pickup-window-past": "La ventana de recojo ya pasó.",
+    "point-required": "Marca el punto en el mapa.",
+    "reason-required": "Escribe el motivo.",
+    "volume-positive": "El volumen debe ser mayor que 0.",
+    "weight-positive": "El peso debe ser mayor que 0."
   },
   "plan": {
     "title": "Planes de monitoreo",
@@ -818,5 +864,60 @@
     "label-placeholder": "Almacén, Casa…",
     "subtitle": "Lugares que usas seguido.",
     "title": "Direcciones guardadas"
+  },
+  "chat": {
+    "closed": "El chat está cerrado. Los mensajes se borran cuando termina el viaje.",
+    "empty": "Aún no hay mensajes. ¡Saluda!",
+    "me": "Yo",
+    "placeholder": "Escribe un mensaje…",
+    "retention-hint": "Los mensajes se borran cuando el viaje se entrega, se confirma o se cancela.",
+    "send": "Enviar",
+    "title": "Chat"
+  },
+  "open-shipments": {
+    "empty": "No hay envíos abiertos ahora.",
+    "need-route": "Primero publica una ruta de retorno para poder ofertar.",
+    "subtitle": "Solicitudes de envío que esperan un camión.",
+    "title": "Envíos abiertos"
+  },
+  "proposal": {
+    "accept": "Aceptar",
+    "cancel": "Retirar oferta",
+    "detail-title": "Oferta",
+    "empty": "Aún no hay ofertas.",
+    "go-to-trip": "Ir al viaje",
+    "list-subtitle-carrier": "Ofertas que hiciste a envíos.",
+    "list-subtitle-merchant": "Ofertas que los transportistas hicieron a tus envíos.",
+    "list-title": "Ofertas",
+    "phone-hidden": "El celular se muestra cuando se acepta la oferta.",
+    "reject": "Rechazar",
+    "confirm-accept": "¿Aceptar esta oferta? Se crea el viaje y se cierran las demás ofertas de este envío.",
+    "confirm-reject": "¿Rechazar esta oferta?",
+    "confirm-cancel": "¿Retirar tu oferta?",
+    "accepted": "Oferta aceptada. Se creó el viaje.",
+    "rejected": "Oferta rechazada.",
+    "canceled": "Oferta retirada."
+  },
+  "route-suggestions": {
+    "empty": "Aún no hay envíos compatibles. Buscamos a 25 km de tu camino.",
+    "route-not-open": "Esta ruta ya no acepta ofertas.",
+    "subtitle": "Envíos en tu camino que caben en la capacidad libre.",
+    "title": "Envíos compatibles"
+  },
+  "shipment": {
+    "cancel": "Cancelar envío",
+    "compatible-routes": "Rutas compatibles",
+    "compatible-routes-hint": "Rutas que pasan cerca de tu recojo y tu entrega. Los transportistas hacen la oferta.",
+    "empty": "Aún no publicaste envíos.",
+    "list-subtitle": "Carga que necesitas mover.",
+    "list-title": "Mis envíos",
+    "new-subtitle": "Describe la carga y marca los puntos exactos en el mapa.",
+    "new-title": "Nuevo envío",
+    "no-compatible-routes": "No hay rutas compatibles por ahora.",
+    "pickup-window": "Ventana de recojo",
+    "publish": "Publicar envío",
+    "view-routes": "Rutas compatibles",
+    "cancelled": "Envío cancelado.",
+    "published": "Envío publicado."
   }
 }

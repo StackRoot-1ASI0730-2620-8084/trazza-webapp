@@ -90,7 +90,7 @@ const STATUS_SEVERITIES = Object.freeze({
     draft: 'secondary',
     pending: 'warn',
     counteroffer: 'warn',
-    accepted: 'info',
+    accepted: 'success',
     matched: 'success',
     rejected: 'danger',
     closed: 'secondary',
@@ -101,7 +101,12 @@ const STATUS_SEVERITIES = Object.freeze({
     paid: 'success',
     failed: 'danger',
     submitted: 'warn',
-    validated: 'success'
+    validated: 'success',
+    published: 'info',
+    full: 'warn',
+    in_progress: 'info',
+    completed: 'success',
+    expired: 'secondary'
 });
 
 /**

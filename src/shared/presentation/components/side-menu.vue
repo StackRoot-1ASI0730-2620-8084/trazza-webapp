@@ -13,8 +13,8 @@ const iamStore = useIamStore();
 const carrierItems = [
   { label: 'option.dashboard',        icon: 'pi pi-home',          to: { name: 'dashboard' } },
   { label: 'option.return-routes',    icon: 'pi pi-directions',    to: { name: 'matchmaking-return-routes' } },
-  { label: 'option.load-suggestions', icon: 'pi pi-box',           to: { name: 'matchmaking-load-suggestions' } },
-  { label: 'option.offers',           icon: 'pi pi-comments',      to: { name: 'matchmaking-offers' } },
+  { label: 'option.open-shipments',   icon: 'pi pi-box',           to: { name: 'matchmaking-open-shipments' } },
+  { label: 'option.proposals',        icon: 'pi pi-comments',      to: { name: 'matchmaking-proposals' } },
   { label: 'option.active-trip',      icon: 'pi pi-truck',         to: { name: 'execution-active-trip' } },
   { label: 'option.trip-history',     icon: 'pi pi-history',       to: { name: 'execution-trip-history' } },
   { label: 'option.vehicles',         icon: 'pi pi-car',           to: { name: 'iam-vehicles' } },
@@ -27,9 +27,8 @@ const carrierItems = [
 
 const merchantItems = [
   { label: 'option.dashboard',          icon: 'pi pi-home',        to: { name: 'dashboard' } },
-  { label: 'option.freight-requests',   icon: 'pi pi-box',         to: { name: 'matchmaking-freight-requests' } },
-  { label: 'option.find-carriers',      icon: 'pi pi-search',      to: { name: 'matchmaking-find-carriers' } },
-  { label: 'option.offers',             icon: 'pi pi-comments',    to: { name: 'matchmaking-offers' } },
+  { label: 'option.shipment-requests',  icon: 'pi pi-box',         to: { name: 'matchmaking-shipment-requests' } },
+  { label: 'option.proposals',          icon: 'pi pi-comments',    to: { name: 'matchmaking-proposals' } },
   { label: 'option.shipment-tracking',  icon: 'pi pi-map-marker',  to: { name: 'execution-shipment-tracking' } },
   { label: 'option.shipment-history',   icon: 'pi pi-history',     to: { name: 'execution-shipment-history' } },
   { label: 'option.ratings',            icon: 'pi pi-star',        to: { name: 'reputation-ratings' } },
