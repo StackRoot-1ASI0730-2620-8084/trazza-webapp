@@ -3,6 +3,7 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import useIamStore from "../../../iam/application/iam.store.js";
+import {UserRole} from "../../../iam/domain/model/user-role.value-object.js";
 
 const emit = defineEmits(['navigate']);
 const { t } = useI18n();
@@ -39,12 +40,24 @@ const merchantItems = [
 
 const items = computed(() => iamStore.isCarrier.value ? carrierItems : merchantItems);
 const accountLabel = computed(() => iamStore.isCarrier.value ? t('menu.carrier-account') : t('menu.merchant-account'));
+const otherRole = computed(() => {
+  const user = iamStore.state.currentUser;
+  if (!user?.hasBothRoles) return null;
+  return iamStore.isCarrier.value ? UserRole.MERCHANT : UserRole.CARRIER;
+});
+
+/** Switches to the other role of the account and goes to its dashboard. */
+const switchRole = () => {
+  iamStore.switchRole(otherRole.value);
+  emit('navigate');
+  router.push({ name: 'dashboard' });
+};
 
 /**
  * Signs the user out and returns to the sign-in page.
  */
-const signOut = () => {
-  iamStore.signOut();
+const signOut = async () => {
+  await iamStore.signOut();
   emit('navigate');
   router.push({ name: 'iam-sign-in' });
 };
@@ -66,6 +79,10 @@ const signOut = () => {
       </li>
     </ul>
     <div class="px-3 pb-3 flex flex-column gap-1">
+      <a v-if="otherRole" href="#" class="menu-link" @click.prevent="switchRole">
+        <i class="pi pi-sync"></i>
+        <span>{{ t('menu.switch-to', { role: t(`roles.${otherRole.toLowerCase()}`) }) }}</span>
+      </a>
       <a href="#" class="menu-link" @click.prevent="signOut">
         <i class="pi pi-sign-out"></i>
         <span>{{ t('menu.sign-out') }}</span>

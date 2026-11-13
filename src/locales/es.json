@@ -27,7 +27,8 @@
     "open": "Abrir menú",
     "alerts": "Alertas",
     "clear": "Limpiar",
-    "no-alerts": "No tienes alertas."
+    "no-alerts": "No tienes alertas.",
+    "switch-to": "Cambiar a {role}"
   },
   "roles": {
     "carrier": "Transportista",
@@ -109,7 +110,13 @@
     "label": "Nombre",
     "sex": "Sexo",
     "latitude": "Latitud",
-    "longitude": "Longitud"
+    "longitude": "Longitud",
+    "height": "Alto (m)",
+    "length": "Largo (m)",
+    "max-load": "Carga máxima (kg)",
+    "model": "Modelo",
+    "volume": "Volumen (m³)",
+    "width": "Ancho (m)"
   },
   "columns": {
     "actions": "Acciones",
@@ -172,7 +179,9 @@
     "paid_externally": "Pagado fuera de Trazza",
     "waived": "Condonado",
     "disputed": "En disputa",
-    "inactive": "Inactivo"
+    "inactive": "Inactivo",
+    "submitted": "Enviado",
+    "validated": "Validado"
   },
   "cargo-types": {
     "general": "General",
@@ -246,7 +255,19 @@
     "pending-verification": "Verificación pendiente",
     "rating": "Calificación",
     "ratings-count": "Calificaciones",
-    "saved": "Perfil actualizado."
+    "saved": "Perfil actualizado.",
+    "account": "Cuenta",
+    "add-carrier-role": "Agregar rol transportista",
+    "add-merchant-role": "Agregar rol comerciante",
+    "become-carrier": "También tengo camiones",
+    "become-carrier-hint": "Agrega el rol transportista para publicar rutas de retorno.",
+    "become-merchant": "También envío carga",
+    "business": "Negocio",
+    "contact": "Contacto",
+    "identity": "Identidad",
+    "roles": "Roles",
+    "verify-hint": "Verificamos tu DNI con RENIEC.",
+    "verify-identity": "Validar identidad"
   },
   "vehicle": {
     "list-title": "Mis vehículos",
@@ -266,7 +287,13 @@
     "deactivate": "Desactivar",
     "confirm-delete": "¿Eliminar el vehículo {plate}?",
     "empty-title": "Aún no tienes vehículos",
-    "empty-content": "Agrega un vehículo para empezar a publicar rutas de retorno."
+    "empty-content": "Agrega un vehículo para empezar a publicar rutas de retorno.",
+    "confirm-deactivate": "¿Desactivar el camión {plate}?",
+    "edit": "Editar camión",
+    "empty": "Aún no hay camiones.",
+    "subtitle": "Camiones que usas en tus rutas.",
+    "title": "Camiones",
+    "volume-auto": "Déjalo vacío para calcularlo con las medidas."
   },
   "return-route": {
     "list-title": "Mis rutas de retorno",

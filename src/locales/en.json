@@ -27,7 +27,8 @@
     "open": "Open menu",
     "alerts": "Alerts",
     "clear": "Clear",
-    "no-alerts": "You have no alerts."
+    "no-alerts": "You have no alerts.",
+    "switch-to": "Switch to {role}"
   },
   "roles": {
     "carrier": "Carrier",
@@ -109,7 +110,13 @@
     "label": "Name",
     "sex": "Sex",
     "latitude": "Latitude",
-    "longitude": "Longitude"
+    "longitude": "Longitude",
+    "height": "Height (m)",
+    "length": "Length (m)",
+    "max-load": "Max load (kg)",
+    "model": "Model",
+    "volume": "Volume (m³)",
+    "width": "Width (m)"
   },
   "columns": {
     "actions": "Actions",
@@ -172,7 +179,9 @@
     "paid_externally": "Paid outside Trazza",
     "waived": "Waived",
     "disputed": "Disputed",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "submitted": "Submitted",
+    "validated": "Validated"
   },
   "cargo-types": {
     "general": "General",
@@ -246,7 +255,19 @@
     "pending-verification": "Verification pending",
     "rating": "Rating",
     "ratings-count": "Ratings",
-    "saved": "Profile updated."
+    "saved": "Profile updated.",
+    "account": "Account",
+    "add-carrier-role": "Add carrier role",
+    "add-merchant-role": "Add merchant role",
+    "become-carrier": "I also have trucks",
+    "become-carrier-hint": "Add the carrier role to publish return routes.",
+    "become-merchant": "I also send cargo",
+    "business": "Business",
+    "contact": "Contact",
+    "identity": "Identity",
+    "roles": "Roles",
+    "verify-hint": "We check your DNI against RENIEC.",
+    "verify-identity": "Validate identity"
   },
   "vehicle": {
     "list-title": "My vehicles",
@@ -266,7 +287,13 @@
     "deactivate": "Deactivate",
     "confirm-delete": "Delete the vehicle {plate}?",
     "empty-title": "You have no vehicles yet",
-    "empty-content": "Add a vehicle to start publishing return routes."
+    "empty-content": "Add a vehicle to start publishing return routes.",
+    "confirm-deactivate": "Deactivate the truck {plate}?",
+    "edit": "Edit truck",
+    "empty": "No trucks yet.",
+    "subtitle": "Trucks you use on your routes.",
+    "title": "Trucks",
+    "volume-auto": "Leave empty to compute it from the dimensions."
   },
   "return-route": {
     "list-title": "My return routes",

@@ -68,17 +68,50 @@ export class IamApi extends BaseApi {
     /**
      * @returns {Promise<import('axios').AxiosResponse>} Response with the account of the signed-in user.
      */
-    getCurrentUser() {
+    getMe() {
         return this.http.get(`${usersEndpointPath}/me`);
     }
 
     /**
      * Updates the contact data (full name and phone) of the signed-in user.
      *
-     * @param {Object} resource - User resource.
+     * @param {{fullName: string, phone: string}} resource - Identity resource.
      * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
      */
-    updateUser(resource) {
+    updateIdentity(resource) {
         return this.http.put(`${usersEndpointPath}/me/identity`, { fullName: resource.fullName, phone: resource.phone });
+    }
+
+    /**
+     * Adds the carrier or the merchant role to the account. The merchant role needs the business data.
+     *
+     * @param {{role: string, merchant: ?Object}} resource - Role resource.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    addRole(resource) {
+        return this.http.post(`${usersEndpointPath}/me/roles`, resource);
+    }
+
+    /**
+     * @param {{businessName: string, businessType: string}} resource - Business data (the RUC cannot change).
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    updateMerchantProfile(resource) {
+        return this.http.put(`${usersEndpointPath}/me/merchant-profile`, resource);
+    }
+
+    /** @returns {Promise<import('axios').AxiosResponse>} Response with the identity checks of the user. */
+    listIdentityVerifications() {
+        return this.http.get(`${usersEndpointPath}/me/identity-verifications`);
+    }
+
+    /**
+     * Sends the identity check to the simulated RENIEC provider.
+     *
+     * @param {{documentFrontS3Key: ?string, documentBackS3Key: ?string}} resource - Document photos, optional.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the created check.
+     */
+    submitIdentityVerification(resource) {
+        return this.http.post(`${usersEndpointPath}/me/identity-verifications`, resource);
     }
 }

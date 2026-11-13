@@ -99,7 +99,9 @@ const STATUS_SEVERITIES = Object.freeze({
     in_transit: 'info',
     delivered: 'success',
     paid: 'success',
-    failed: 'danger'
+    failed: 'danger',
+    submitted: 'warn',
+    validated: 'success'
 });
 
 /**

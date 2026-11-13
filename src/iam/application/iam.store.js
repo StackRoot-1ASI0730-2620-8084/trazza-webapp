@@ -1,19 +1,22 @@
 import {computed, reactive} from "vue";
 import {IamApi} from "../infrastructure/iam-api.js";
-import {UserAssembler} from "../infrastructure/user.assembler.js";
+import {IamAssembler} from "../infrastructure/iam.assembler.js";
 import {sessionStorage} from "../infrastructure/session.storage.js";
-import {Phone} from "../domain/model/phone.value-object.js";
 import {UserRole} from "../domain/model/user-role.value-object.js";
 
 const iamApi = new IamApi();
 
 /**
- * Reactive state of the IAM bounded context.
+ * Reactive state of the IAM bounded context. One account can hold both roles; the active role decides which
+ * menu the user sees and can be switched at any time.
  *
- * @type {{currentUser: ?import('../domain/model/user.entity.js').User, errors: Error[], processing: boolean}}
+ * @type {{currentUser: ?import('../domain/model/user.entity.js').User, activeRole: ?string, verifications: Object[],
+ *     errors: Error[], processing: boolean}}
  */
 const state = reactive({
     currentUser: null,
+    activeRole: null,
+    verifications: [],
     errors: [],
     processing: false
 });
@@ -21,46 +24,45 @@ const state = reactive({
 /** @type {import('vue').ComputedRef<boolean>} Whether a user is signed in. */
 const isSignedIn = computed(() => state.currentUser !== null);
 
-/** @type {import('vue').ComputedRef<?string>} Role of the signed-in user. */
-const currentRole = computed(() => state.currentUser?.role.value ?? null);
+/** @type {import('vue').ComputedRef<string[]>} Roles of the account. */
+const roles = computed(() => state.currentUser?.roles ?? []);
 
-/** @type {import('vue').ComputedRef<?number>} Identifier of the signed-in user. */
+/** @type {import('vue').ComputedRef<?string>} Role the user is working with (CARRIER or MERCHANT). */
+const activeRole = computed(() => state.activeRole);
+
+/** @type {import('vue').ComputedRef<?string>} Same as the active role. */
+const currentRole = activeRole;
+
+/** @type {import('vue').ComputedRef<?string>} Public id of the signed-in user. */
 const currentUserId = computed(() => state.currentUser?.id ?? null);
 
-/** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a carrier. */
-const isCarrier = computed(() => currentRole.value === UserRole.CARRIER);
+/** @type {import('vue').ComputedRef<boolean>} Whether the user works as a carrier. */
+const isCarrier = computed(() => state.activeRole === UserRole.CARRIER);
 
-/** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a merchant. */
-const isMerchant = computed(() => currentRole.value === UserRole.MERCHANT);
+/** @type {import('vue').ComputedRef<boolean>} Whether the user works as a merchant. */
+const isMerchant = computed(() => state.activeRole === UserRole.MERCHANT);
 
 /**
- * Applies the account stored in the session to the state. The session storage calls it on sign-in, on every
- * refresh of the tokens and on sign-out (with null).
+ * Applies an account resource to the state and keeps the active role valid. The session storage calls it on
+ * sign-in, on every refresh of the tokens and on sign-out (with null).
  *
  * @param {?Object} resource - Account resource, or null when the session ends.
  * @returns {void}
  */
 function applyUser(resource) {
-    try {
-        state.currentUser = resource ? UserAssembler.toEntityFromResource(resource) : null;
-    } catch (error) {
+    if (!resource) {
         state.currentUser = null;
+        state.activeRole = null;
+        return;
     }
+    state.currentUser = IamAssembler.toUser(resource);
+    const stored = sessionStorage.activeRole;
+    state.activeRole = state.currentUser.hasRole(stored) ? stored : state.currentUser.roles[0] ?? null;
+    sessionStorage.activeRole = state.activeRole;
 }
 
-/**
- * Stores the session of a user in the browser storage.
- *
- * @param {Object} session - Session resource issued by the Trazza Platform API.
- * @param {string} session.accessToken - Bearer token (JWT).
- * @param {string} session.refreshToken - Token used to renew the session.
- * @param {Object} session.user - Account of the authenticated user.
- * @returns {import('../domain/model/user.entity.js').User} Authenticated user.
- */
-function startSession(session) {
-    sessionStorage.save(session);
-    return state.currentUser;
-}
+sessionStorage.onChange(applyUser);
+applyUser(sessionStorage.accessToken ? sessionStorage.user : null);
 
 /**
  * Turns an error response of the platform API into an error whose message is an i18n key.
@@ -75,13 +77,19 @@ function toApiError(error) {
 }
 
 /**
- * Restores a previous session from the browser storage and follows its changes.
+ * Runs an action while the processing flag is on.
  *
- * @returns {void}
+ * @template T
+ * @param {function(): Promise<T>} action - Action to run.
+ * @returns {Promise<T>} Result of the action.
  */
-function restoreSession() {
-    sessionStorage.onChange(applyUser);
-    applyUser(sessionStorage.accessToken ? sessionStorage.user : null);
+async function run(action) {
+    state.processing = true;
+    try {
+        return await action();
+    } finally {
+        state.processing = false;
+    }
 }
 
 /**
@@ -89,59 +97,36 @@ function restoreSession() {
  *
  * @param {import('../domain/commands/sign-in.command.js').SignInCommand} signInCommand - Sign-in command.
  * @returns {Promise<import('../domain/model/user.entity.js').User>} Authenticated user.
- * @throws {Error} When the credentials are not valid.
  */
-async function signIn(signInCommand) {
-    state.processing = true;
+const signIn = signInCommand => run(async () => {
     try {
         const response = await iamApi.signIn(signInCommand).catch(error => { throw toApiError(error); });
-        const user = startSession(response.data);
+        sessionStorage.save(response.data);
         state.errors = [];
-        return user;
+        return state.currentUser;
     } catch (error) {
         state.errors.push(error);
         throw error;
-    } finally {
-        state.processing = false;
     }
-}
+});
 
 /**
  * Executes the sign-up use case: the platform registers the user with its profile and opens a session.
  *
  * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
  * @returns {Promise<import('../domain/model/user.entity.js').User>} Registered user.
- * @throws {Error} When the API rejects the registration (e.g. the e-mail is already registered).
  */
-async function signUp(signUpCommand) {
-    state.processing = true;
+const signUp = signUpCommand => run(async () => {
     try {
         const response = await iamApi.signUp(signUpCommand).catch(error => { throw toApiError(error); });
-        const user = startSession(response.data);
+        sessionStorage.save(response.data);
         state.errors = [];
-        return user;
+        return state.currentUser;
     } catch (error) {
         state.errors.push(error);
         throw error;
-    } finally {
-        state.processing = false;
     }
-}
-
-/**
- * Updates the contact data of the signed-in user.
- *
- * @param {Object} params - New contact data.
- * @param {string} params.fullName - Full name.
- * @param {string} params.phone - Mobile phone.
- * @returns {Promise<void>}
- */
-async function updateCurrentUser({ fullName, phone }) {
-    const user = state.currentUser;
-    user.updateContact({ fullName, phone: new Phone(phone) });
-    const response = await iamApi.updateUser(UserAssembler.toResourceFromEntity(user));
-    sessionStorage.saveUser(response.data);
-}
+});
 
 /**
  * Revokes the refresh token in the API (best effort) and clears the local session.
@@ -159,11 +144,82 @@ async function signOut() {
     sessionStorage.clear();
 }
 
-restoreSession();
+/**
+ * Reloads the account from the API (roles, profiles, KYC status).
+ *
+ * @returns {Promise<import('../domain/model/user.entity.js').User>} Signed-in user.
+ */
+async function refreshAccount() {
+    const response = await iamApi.getMe();
+    sessionStorage.saveUser(response.data);
+    return state.currentUser;
+}
+
+/**
+ * @param {string} role - CARRIER or MERCHANT, must be one of the user's roles.
+ * @returns {void}
+ */
+function switchRole(role) {
+    if (!state.currentUser?.hasRole(role)) return;
+    state.activeRole = role;
+    sessionStorage.activeRole = role;
+}
+
+/**
+ * Updates the contact data of the signed-in user.
+ *
+ * @param {{fullName: string, phone: string}} identity - New contact data.
+ * @returns {Promise<void>}
+ */
+const updateIdentity = ({ fullName, phone }) => run(async () => {
+    const response = await iamApi.updateIdentity({ fullName, phone });
+    sessionStorage.saveUser(response.data);
+});
+
+/**
+ * Adds the missing role to the account and switches to it. The merchant role needs the business data.
+ *
+ * @param {string} role - CARRIER or MERCHANT.
+ * @param {?{businessName: string, ruc: string, businessType: string}} merchant - Business data.
+ * @returns {Promise<void>}
+ */
+const addRole = (role, merchant = null) => run(async () => {
+    const response = await iamApi.addRole({ role, merchant });
+    sessionStorage.saveUser(response.data);
+    switchRole(role);
+});
+
+/**
+ * @param {{businessName: string, businessType: string}} business - New business data.
+ * @returns {Promise<void>}
+ */
+const updateMerchantProfile = ({ businessName, businessType }) => run(async () => {
+    const response = await iamApi.updateMerchantProfile({ businessName, businessType });
+    sessionStorage.saveUser(response.data);
+});
+
+/** @returns {Promise<void>} Loads the identity checks of the user. */
+async function fetchVerifications() {
+    state.verifications = (await iamApi.listIdentityVerifications()).data;
+}
+
+/**
+ * Sends the identity check to the simulated RENIEC provider and reloads the account.
+ *
+ * @param {?string} [documentFrontS3Key=null] - Photo of the front of the DNI.
+ * @param {?string} [documentBackS3Key=null] - Photo of the back of the DNI.
+ * @returns {Promise<void>}
+ */
+const submitVerification = (documentFrontS3Key = null, documentBackS3Key = null) => run(async () => {
+    await iamApi.submitIdentityVerification({ documentFrontS3Key, documentBackS3Key });
+    await Promise.all([fetchVerifications(), refreshAccount()]);
+});
 
 const iamStore = {
     state,
     isSignedIn,
+    roles,
+    activeRole,
     currentRole,
     currentUserId,
     isCarrier,
@@ -171,7 +227,13 @@ const iamStore = {
     signIn,
     signUp,
     signOut,
-    updateCurrentUser
+    refreshAccount,
+    switchRole,
+    updateIdentity,
+    addRole,
+    updateMerchantProfile,
+    fetchVerifications,
+    submitVerification
 };
 
 /**

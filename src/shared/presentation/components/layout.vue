@@ -36,13 +36,13 @@ const loadContexts = async () => {
     [useReputationStore(), store => store.fetchRatings()]
   ];
   const errors = (await Promise.all(loads.map(async ([store, load]) => {
-    const previousCount = store.state.errors?.length ?? 0;
+    const previousCount = store.state?.errors?.length ?? 0;
     try {
       await load(store);
     } catch (error) {
       return [error];
     }
-    return store.state.errors?.slice(previousCount) ?? [];
+    return store.state?.errors?.slice(previousCount) ?? [];
   }))).flat();
 
   const connectionError = errors.find(error => error?.isAxiosError && !error.response);
@@ -51,7 +51,7 @@ const loadContexts = async () => {
 };
 
 // When the session ends (sign-out, or a refresh token that is no longer valid) the user returns to sign-in.
-watch(() => iamStore.isSignedIn.value, signedIn => {
+watch(() => [iamStore.isSignedIn.value, iamStore.activeRole.value], ([signedIn]) => {
   if (signedIn) loadContexts();
   else if (!isPublicRoute.value) router.push({ name: 'iam-sign-in' });
 }, { immediate: true });
