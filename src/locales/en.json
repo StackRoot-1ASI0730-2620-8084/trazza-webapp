@@ -93,7 +93,8 @@
     "card-number": "Card number",
     "card-holder": "Card holder",
     "expiry": "Expiry",
-    "receipt-type": "Receipt"
+    "receipt-type": "Receipt",
+    "comment": "Comment"
   },
   "columns": {
     "actions": "Actions",
@@ -115,7 +116,9 @@
     "status": "Status",
     "suggestions": "Suggestions",
     "vehicle": "Vehicle",
-    "weight": "Weight"
+    "weight": "Weight",
+    "points": "Points",
+    "reason": "Reason"
   },
   "filters": {
     "all-statuses": "All statuses",
@@ -452,9 +455,20 @@
     "comment": "Comment (optional)",
     "skip": "Skip",
     "submit": "Submit rating",
-    "sent": "Thanks! Your rating was saved.",
+    "sent": "Thanks for your rating.",
     "rate-merchant": "Rate the merchant",
-    "rate-carrier": "Rate the carrier"
+    "rate-carrier": "Rate the carrier",
+    "count": "{count} ratings",
+    "empty": "No ratings yet.",
+    "given": "Given",
+    "list-subtitle": "What others say about you and what you said.",
+    "list-title": "Ratings",
+    "points-hint": "You earn 2 points for rating.",
+    "rate": "Rate {name}",
+    "received": "Received",
+    "send": "Send rating",
+    "title": "Rate {name}",
+    "view-trip": "View trip"
   },
   "reputation": {
     "title": "Ratings",
@@ -465,6 +479,21 @@
     "no-ratings": "No ratings yet",
     "average-of": "{average} ({count} ratings)",
     "empty": "There are no ratings yet."
+  },
+  "points": {
+    "balance": "Balance",
+    "empty": "No movements yet.",
+    "reasons": {
+      "adjustment": "Adjustment",
+      "rating-given": "Rating given",
+      "redemption": "Redemption",
+      "trip-completed": "Trip confirmed"
+    },
+    "redeem": "Redeem points",
+    "redeemed": "Points redeemed.",
+    "rules": "You earn 10 points per confirmed trip and 2 per rating you give.",
+    "subtitle": "Your loyalty points.",
+    "title": "Points"
   },
   "billing": {
     "title": "Plan & Billing",

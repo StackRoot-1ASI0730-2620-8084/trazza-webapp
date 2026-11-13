@@ -93,7 +93,8 @@
     "card-number": "Número de tarjeta",
     "card-holder": "Titular",
     "expiry": "Vencimiento",
-    "receipt-type": "Comprobante"
+    "receipt-type": "Comprobante",
+    "comment": "Comentario"
   },
   "columns": {
     "actions": "Acciones",
@@ -115,7 +116,9 @@
     "status": "Estado",
     "suggestions": "Sugerencias",
     "vehicle": "Vehículo",
-    "weight": "Peso"
+    "weight": "Peso",
+    "points": "Puntos",
+    "reason": "Motivo"
   },
   "filters": {
     "all-statuses": "Todos los estados",
@@ -452,9 +455,20 @@
     "comment": "Comentario (opcional)",
     "skip": "Omitir",
     "submit": "Enviar calificación",
-    "sent": "¡Gracias! Tu calificación fue guardada.",
+    "sent": "Gracias por calificar.",
     "rate-merchant": "Calificar al emprendedor",
-    "rate-carrier": "Calificar al transportista"
+    "rate-carrier": "Calificar al transportista",
+    "count": "{count} calificaciones",
+    "empty": "Aún no hay calificaciones.",
+    "given": "Dadas",
+    "list-subtitle": "Lo que dicen de ti y lo que dijiste.",
+    "list-title": "Calificaciones",
+    "points-hint": "Ganas 2 puntos por calificar.",
+    "rate": "Calificar a {name}",
+    "received": "Recibidas",
+    "send": "Enviar calificación",
+    "title": "Calificar a {name}",
+    "view-trip": "Ver viaje"
   },
   "reputation": {
     "title": "Calificaciones",
@@ -465,6 +479,21 @@
     "no-ratings": "Sin calificaciones",
     "average-of": "{average} ({count} calificaciones)",
     "empty": "Aún no hay calificaciones."
+  },
+  "points": {
+    "balance": "Saldo",
+    "empty": "Aún no hay movimientos.",
+    "reasons": {
+      "adjustment": "Ajuste",
+      "rating-given": "Calificación dada",
+      "redemption": "Canje",
+      "trip-completed": "Viaje confirmado"
+    },
+    "redeem": "Canjear puntos",
+    "redeemed": "Puntos canjeados.",
+    "rules": "Ganas 10 puntos por viaje confirmado y 2 por cada calificación que das.",
+    "subtitle": "Tus puntos de fidelidad.",
+    "title": "Puntos"
   },
   "billing": {
     "title": "Plan y facturación",
