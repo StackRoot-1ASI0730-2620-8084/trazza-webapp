@@ -1,5 +1,4 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
-import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
 const usersEndpointPath = import.meta.env.VITE_USERS_ENDPOINT_PATH;
 const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_PATH;
@@ -11,17 +10,11 @@ const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_
  * @extends BaseApi
  */
 export class IamApi extends BaseApi {
-    /** Creates the endpoint client for users. */
-    constructor() {
-        super();
-        this._usersEndpoint = new BaseEndpoint(this, usersEndpointPath);
-    }
-
     /**
      * Authenticates a user against the Trazza Platform API.
      *
      * @param {import('../domain/commands/sign-in.command.js').SignInCommand} signInCommand - Sign-in command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the user resource and its bearer token.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the session tokens and the account.
      */
     signIn(signInCommand) {
         return this.http.post(`${authenticationEndpointPath}/sign-in`, {
@@ -34,33 +27,36 @@ export class IamApi extends BaseApi {
      * Registers a new user from a sign-up command.
      *
      * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created user and its bearer token.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the session tokens and the created account.
      */
     signUp(signUpCommand) {
         return this.http.post(`${authenticationEndpointPath}/sign-up`, {
-            fullName: signUpCommand.fullName,
             email: signUpCommand.email,
+            password: signUpCommand.password,
+            fullName: signUpCommand.fullName,
+            dni: signUpCommand.dni,
             phone: signUpCommand.phone,
-            role: signUpCommand.role,
-            password: signUpCommand.password
+            roles: [signUpCommand.role.toUpperCase()],
+            merchant: signUpCommand.isMerchant
+                ? { businessName: signUpCommand.businessName, ruc: signUpCommand.ruc, businessType: signUpCommand.businessType }
+                : null
         });
     }
 
     /**
-     * @param {number} id - User identifier.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the user.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the account of the signed-in user.
      */
-    getUserById(id) {
-        return this._usersEndpoint.getById(id);
+    getCurrentUser() {
+        return this.http.get(`${usersEndpointPath}/me`);
     }
 
     /**
-     * Updates the contact data (full name and phone) of a user.
+     * Updates the contact data (full name and phone) of the signed-in user.
      *
-     * @param {Object} resource - User resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated user.
+     * @param {Object} resource - User resource.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
      */
     updateUser(resource) {
-        return this._usersEndpoint.update(resource.id, { fullName: resource.fullName, phone: resource.phone });
+        return this.http.put(`${usersEndpointPath}/me/identity`, { fullName: resource.fullName, phone: resource.phone });
     }
 }

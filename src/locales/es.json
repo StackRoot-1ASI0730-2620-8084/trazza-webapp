@@ -13,7 +13,10 @@
     "freight-requests": "Solicitudes de envío",
     "find-carriers": "Buscar transportistas",
     "shipment-tracking": "Seguimiento de envíos",
-    "shipment-history": "Historial de envíos"
+    "shipment-history": "Historial de envíos",
+    "plans": "Planes",
+    "subscriptions": "Mi suscripción",
+    "settlements": "Liquidaciones"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -48,8 +51,9 @@
   },
   "errors": {
     "title": "Algo salió mal",
-    "network": "No pudimos conectar con el servidor de Trazza. Verifica que la API simulada esté en ejecución.",
-    "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo."
+    "network": "No pudimos conectar con el servidor de Trazza. Revisa tu conexión e inténtalo de nuevo.",
+    "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo.",
+    "server": "El servidor de Trazza no pudo completar la solicitud. Es posible que esta función aún no esté disponible."
   },
   "alerts": {
     "offers-waiting": "Tienes {count} oferta(s) esperando tu respuesta",
@@ -94,7 +98,8 @@
     "card-holder": "Titular",
     "expiry": "Vencimiento",
     "receipt-type": "Comprobante",
-    "comment": "Comentario"
+    "comment": "Comentario",
+    "business-type": "Tipo de negocio"
   },
   "columns": {
     "actions": "Acciones",
@@ -118,7 +123,8 @@
     "vehicle": "Vehículo",
     "weight": "Peso",
     "points": "Puntos",
-    "reason": "Motivo"
+    "reason": "Motivo",
+    "trip": "Viaje"
   },
   "filters": {
     "all-statuses": "Todos los estados",
@@ -148,7 +154,14 @@
     "in_transit": "En tránsito",
     "delivered": "Entregado",
     "paid": "Pagado",
-    "failed": "Fallido"
+    "failed": "Fallido",
+    "past_due": "Pago vencido",
+    "refunded": "Reembolsado",
+    "marked_paid": "Marcado como pagado",
+    "settled": "Liquidado",
+    "paid_externally": "Pagado fuera de Trazza",
+    "waived": "Condonado",
+    "disputed": "En disputa"
   },
   "cargo-types": {
     "general": "General",
@@ -201,7 +214,7 @@
     "merchant-title": "Soy emprendedor",
     "merchant-description": "Necesito enviar mercadería",
     "dni-placeholder": "8 dígitos",
-    "dni-hint": "Los emprendedores ingresan el RUC de su negocio.",
+    "dni-hint": "DNI del titular de la cuenta.",
     "ruc-placeholder": "11 dígitos",
     "ruc-hint": "RUC de tu negocio (empieza con 10 o 20).",
     "password-prompt": "Mínimo 8 caracteres",
@@ -210,7 +223,8 @@
     "password-strong": "Fuerte",
     "accept-terms": "Acepto los Términos y Condiciones y la Política de Privacidad",
     "submit": "Crear cuenta",
-    "have-account": "¿Ya tienes una cuenta?"
+    "have-account": "¿Ya tienes una cuenta?",
+    "business-type-placeholder": "Ej. Bodega, panadería"
   },
   "profile": {
     "title": "Perfil",
@@ -686,6 +700,66 @@
     "vehicle-invalid": "Vehículo inválido.",
     "vehicle-not-found": "El vehículo no existe.",
     "vehicle-required": "Selecciona un vehículo.",
-    "volume-exceeds-vehicle": "El volumen no puede superar el del vehículo."
+    "volume-exceeds-vehicle": "El volumen no puede superar el del vehículo.",
+    "business-type-required": "Ingresa el tipo de tu negocio.",
+    "dni-already-registered": "Este DNI ya está registrado.",
+    "ruc-already-registered": "Este RUC ya está registrado.",
+    "merchant-data-required": "Ingresa los datos de tu negocio.",
+    "role-required": "Elige cómo usarás Trazza.",
+    "authentication-required": "Debes iniciar sesión.",
+    "plan-vehicle-count": "La cantidad de camiones no corresponde al plan elegido."
+  },
+  "plan": {
+    "title": "Planes de monitoreo",
+    "subtitle": "Elige cómo quieres monitorear tus camiones: solo la ruta, la carga con IoT o un paquete para tu flota.",
+    "per-month": "/ mes",
+    "per-truck-month": "/ camión / mes",
+    "min-trucks": "Desde {min} camiones",
+    "range-trucks": "De {min} a {max} camiones",
+    "includes-iot": "Incluye dispositivo IoT",
+    "subscribe": "Suscribirme",
+    "subscribe-to": "Suscribirse a {name}",
+    "choose-trucks": "Elige los camiones",
+    "monthly-total": "Total mensual",
+    "pay-simulated": "Pagar (simulado)",
+    "simulated-note": "El pago es simulado: no se realiza ningún cobro real.",
+    "subscribed": "Suscripción activada.",
+    "types": {
+      "route": "Monitoreo de ruta",
+      "iot_cargo": "Monitoreo de carga IoT",
+      "full": "Ruta y carga IoT"
+    }
+  },
+  "subscription": {
+    "title": "Mi suscripción",
+    "subtitle": "Revisa tu plan activo, el periodo actual y tus pagos.",
+    "empty": "Aún no tienes una suscripción. Revisa los",
+    "period": "Periodo actual",
+    "operation": "N.º de operación",
+    "renew": "Renovar",
+    "cancel": "Cancelar suscripción",
+    "confirm-cancel": "¿Seguro que quieres cancelar tu suscripción? Dejarás de monitorear tus camiones al terminar el periodo.",
+    "renewed": "Suscripción renovada.",
+    "cancelled": "Suscripción cancelada."
+  },
+  "settlement": {
+    "title": "Liquidaciones",
+    "subtitle": "Pagos de fletes entre emprendedores y transportistas, y compensaciones por cancelación.",
+    "freight": "Pagos de flete",
+    "empty": "No hay pagos de flete pendientes.",
+    "reference": "Referencia de pago",
+    "mark-paid": "Marcar como pagado",
+    "confirm": "Confirmar recepción",
+    "external-note": "El flete se paga fuera de Trazza (transferencia, Yape o Plin). Ingresa la referencia para que el transportista confirme la recepción.",
+    "marked-paid": "Pago registrado. El transportista debe confirmarlo.",
+    "confirmed": "Recepción del pago confirmada."
+  },
+  "compensation": {
+    "title": "Compensaciones por cancelación",
+    "rule": "Si un viaje confirmado se cancela, quien lo cancela compensa a la otra parte.",
+    "empty": "No hay compensaciones pendientes.",
+    "confirm-paid": "Confirmar pago",
+    "waive": "Condonar",
+    "dispute": "Disputar"
   }
 }
