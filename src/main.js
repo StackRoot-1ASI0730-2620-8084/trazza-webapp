@@ -40,6 +40,11 @@ import {
     Select,
     SelectButton,
     Tag,
+    Tab,
+    TabList,
+    TabPanel,
+    TabPanels,
+    Tabs,
     Textarea,
     Timeline,
     Toast,
@@ -106,6 +111,11 @@ createApp(App)
     .component('pv-select',         Select)
     .component('pv-select-button',  SelectButton)
     .component('pv-tag',            Tag)
+    .component('pv-tab',            Tab)
+    .component('pv-tab-list',       TabList)
+    .component('pv-tab-panel',      TabPanel)
+    .component('pv-tab-panels',     TabPanels)
+    .component('pv-tabs',           Tabs)
     .component('pv-textarea',       Textarea)
     .component('pv-timeline',       Timeline)
     .component('pv-toast',          Toast)
