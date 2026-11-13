@@ -1,7 +1,11 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
+import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
 const usersEndpointPath = import.meta.env.VITE_USERS_ENDPOINT_PATH;
 const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_PATH;
+const vehiclesEndpointPath = import.meta.env.VITE_VEHICLES_ENDPOINT_PATH ?? '/vehicles';
+const driversEndpointPath = import.meta.env.VITE_DRIVERS_ENDPOINT_PATH ?? '/drivers';
+const savedAddressesEndpointPath = import.meta.env.VITE_SAVED_ADDRESSES_ENDPOINT_PATH ?? '/saved-addresses';
 
 /**
  * Infrastructure gateway for the IAM endpoints.
@@ -10,6 +14,14 @@ const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_
  * @extends BaseApi
  */
 export class IamApi extends BaseApi {
+    /** Creates the endpoint clients of the carrier fleet and of the saved addresses. */
+    constructor() {
+        super();
+        this.vehicles = new BaseEndpoint(this, vehiclesEndpointPath);
+        this.drivers = new BaseEndpoint(this, driversEndpointPath);
+        this.savedAddresses = new BaseEndpoint(this, savedAddressesEndpointPath);
+    }
+
     /**
      * Authenticates a user against the Trazza Platform API.
      *
@@ -36,7 +48,7 @@ export class IamApi extends BaseApi {
             fullName: signUpCommand.fullName,
             dni: signUpCommand.dni,
             phone: signUpCommand.phone,
-            roles: [signUpCommand.role.toUpperCase()],
+            roles: [signUpCommand.role],
             merchant: signUpCommand.isMerchant
                 ? { businessName: signUpCommand.businessName, ruc: signUpCommand.ruc, businessType: signUpCommand.businessType }
                 : null
@@ -44,19 +56,62 @@ export class IamApi extends BaseApi {
     }
 
     /**
+     * Revokes the refresh token of the session.
+     *
+     * @param {string} refreshToken - Refresh token to revoke.
+     * @returns {Promise<import('axios').AxiosResponse>} Empty response.
+     */
+    signOut(refreshToken) {
+        return this.http.post(`${authenticationEndpointPath}/sign-out`, { refreshToken });
+    }
+
+    /**
      * @returns {Promise<import('axios').AxiosResponse>} Response with the account of the signed-in user.
      */
-    getCurrentUser() {
+    getMe() {
         return this.http.get(`${usersEndpointPath}/me`);
     }
 
     /**
      * Updates the contact data (full name and phone) of the signed-in user.
      *
-     * @param {Object} resource - User resource.
+     * @param {{fullName: string, phone: string}} resource - Identity resource.
      * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
      */
-    updateUser(resource) {
+    updateIdentity(resource) {
         return this.http.put(`${usersEndpointPath}/me/identity`, { fullName: resource.fullName, phone: resource.phone });
+    }
+
+    /**
+     * Adds the carrier or the merchant role to the account. The merchant role needs the business data.
+     *
+     * @param {{role: string, merchant: ?Object}} resource - Role resource.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    addRole(resource) {
+        return this.http.post(`${usersEndpointPath}/me/roles`, resource);
+    }
+
+    /**
+     * @param {{businessName: string, businessType: string}} resource - Business data (the RUC cannot change).
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    updateMerchantProfile(resource) {
+        return this.http.put(`${usersEndpointPath}/me/merchant-profile`, resource);
+    }
+
+    /** @returns {Promise<import('axios').AxiosResponse>} Response with the identity checks of the user. */
+    listIdentityVerifications() {
+        return this.http.get(`${usersEndpointPath}/me/identity-verifications`);
+    }
+
+    /**
+     * Sends the identity check to the simulated RENIEC provider.
+     *
+     * @param {{documentFrontS3Key: ?string, documentBackS3Key: ?string}} resource - Document photos, optional.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the created check.
+     */
+    submitIdentityVerification(resource) {
+        return this.http.post(`${usersEndpointPath}/me/identity-verifications`, resource);
     }
 }

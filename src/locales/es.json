@@ -16,7 +16,9 @@
     "shipment-history": "Historial de envíos",
     "plans": "Planes",
     "subscriptions": "Mi suscripción",
-    "settlements": "Liquidaciones"
+    "settlements": "Liquidaciones",
+    "drivers": "Conductores",
+    "saved-addresses": "Direcciones guardadas"
   },
   "menu": {
     "carrier-account": "Cuenta de transportista",
@@ -25,7 +27,8 @@
     "open": "Abrir menú",
     "alerts": "Alertas",
     "clear": "Limpiar",
-    "no-alerts": "No tienes alertas."
+    "no-alerts": "No tienes alertas.",
+    "switch-to": "Cambiar a {role}"
   },
   "roles": {
     "carrier": "Transportista",
@@ -44,7 +47,8 @@
     "edit": "Editar",
     "reject": "Rechazar",
     "save-changes": "Guardar cambios",
-    "send": "Enviar"
+    "send": "Enviar",
+    "save": "Guardar"
   },
   "messages": {
     "done": "Listo"
@@ -99,7 +103,20 @@
     "expiry": "Vencimiento",
     "receipt-type": "Comprobante",
     "comment": "Comentario",
-    "business-type": "Tipo de negocio"
+    "business-type": "Tipo de negocio",
+    "address": "Dirección",
+    "coordinates": "Coordenadas",
+    "experience": "Experiencia",
+    "label": "Nombre",
+    "sex": "Sexo",
+    "latitude": "Latitud",
+    "longitude": "Longitud",
+    "height": "Alto (m)",
+    "length": "Largo (m)",
+    "max-load": "Carga máxima (kg)",
+    "model": "Modelo",
+    "volume": "Volumen (m³)",
+    "width": "Ancho (m)"
   },
   "columns": {
     "actions": "Acciones",
@@ -161,7 +178,10 @@
     "settled": "Liquidado",
     "paid_externally": "Pagado fuera de Trazza",
     "waived": "Condonado",
-    "disputed": "En disputa"
+    "disputed": "En disputa",
+    "inactive": "Inactivo",
+    "submitted": "Enviado",
+    "validated": "Validado"
   },
   "cargo-types": {
     "general": "General",
@@ -235,7 +255,19 @@
     "pending-verification": "Verificación pendiente",
     "rating": "Calificación",
     "ratings-count": "Calificaciones",
-    "saved": "Perfil actualizado."
+    "saved": "Perfil actualizado.",
+    "account": "Cuenta",
+    "add-carrier-role": "Agregar rol transportista",
+    "add-merchant-role": "Agregar rol comerciante",
+    "become-carrier": "También tengo camiones",
+    "become-carrier-hint": "Agrega el rol transportista para publicar rutas de retorno.",
+    "become-merchant": "También envío carga",
+    "business": "Negocio",
+    "contact": "Contacto",
+    "identity": "Identidad",
+    "roles": "Roles",
+    "verify-hint": "Verificamos tu DNI con RENIEC.",
+    "verify-identity": "Validar identidad"
   },
   "vehicle": {
     "list-title": "Mis vehículos",
@@ -255,7 +287,13 @@
     "deactivate": "Desactivar",
     "confirm-delete": "¿Eliminar el vehículo {plate}?",
     "empty-title": "Aún no tienes vehículos",
-    "empty-content": "Agrega un vehículo para empezar a publicar rutas de retorno."
+    "empty-content": "Agrega un vehículo para empezar a publicar rutas de retorno.",
+    "confirm-deactivate": "¿Desactivar el camión {plate}?",
+    "edit": "Editar camión",
+    "empty": "Aún no hay camiones.",
+    "subtitle": "Camiones que usas en tus rutas.",
+    "title": "Camiones",
+    "volume-auto": "Déjalo vacío para calcularlo con las medidas."
   },
   "return-route": {
     "list-title": "Mis rutas de retorno",
@@ -761,5 +799,24 @@
     "confirm-paid": "Confirmar pago",
     "waive": "Condonar",
     "dispute": "Disputar"
+  },
+  "driver": {
+    "add": "Agregar conductor",
+    "deactivate": "Desactivar",
+    "edit": "Editar conductor",
+    "empty": "Aún no hay conductores.",
+    "sex-f": "Femenino",
+    "sex-m": "Masculino",
+    "sex-none": "Prefiere no decirlo",
+    "sex-x": "Otro",
+    "subtitle": "Personas que manejan tus camiones.",
+    "title": "Conductores"
+  },
+  "saved-address": {
+    "add": "Agregar dirección",
+    "empty": "No hay direcciones guardadas.",
+    "label-placeholder": "Almacén, Casa…",
+    "subtitle": "Lugares que usas seguido.",
+    "title": "Direcciones guardadas"
   }
 }

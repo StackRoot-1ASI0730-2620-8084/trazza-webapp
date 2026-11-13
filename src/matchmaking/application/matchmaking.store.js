@@ -42,7 +42,7 @@ const today = () => new Date().toLocaleDateString('en-CA');
 const currentUserId = () => useIamStore().currentUserId.value;
 
 /** @returns {?string} Role of the signed-in user. */
-const currentRole = () => useIamStore().currentRole.value;
+const currentRole = () => useIamStore().currentRole.value?.toLowerCase();
 
 /** @type {import('vue').ComputedRef<ReturnRoute[]>} Return routes of the signed-in carrier, newest first. */
 const myReturnRoutes = computed(() => state.returnRoutes

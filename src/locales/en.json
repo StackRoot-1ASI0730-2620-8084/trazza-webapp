@@ -16,7 +16,9 @@
     "shipment-history": "Shipment History",
     "plans": "Plans",
     "subscriptions": "My subscription",
-    "settlements": "Settlements"
+    "settlements": "Settlements",
+    "drivers": "Drivers",
+    "saved-addresses": "Saved addresses"
   },
   "menu": {
     "carrier-account": "Carrier account",
@@ -25,7 +27,8 @@
     "open": "Open menu",
     "alerts": "Alerts",
     "clear": "Clear",
-    "no-alerts": "You have no alerts."
+    "no-alerts": "You have no alerts.",
+    "switch-to": "Switch to {role}"
   },
   "roles": {
     "carrier": "Carrier",
@@ -44,7 +47,8 @@
     "edit": "Edit",
     "reject": "Reject",
     "save-changes": "Save changes",
-    "send": "Send"
+    "send": "Send",
+    "save": "Save"
   },
   "messages": {
     "done": "Done"
@@ -99,7 +103,20 @@
     "expiry": "Expiry",
     "receipt-type": "Receipt",
     "comment": "Comment",
-    "business-type": "Type of business"
+    "business-type": "Type of business",
+    "address": "Address",
+    "coordinates": "Coordinates",
+    "experience": "Experience",
+    "label": "Name",
+    "sex": "Sex",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
+    "height": "Height (m)",
+    "length": "Length (m)",
+    "max-load": "Max load (kg)",
+    "model": "Model",
+    "volume": "Volume (m³)",
+    "width": "Width (m)"
   },
   "columns": {
     "actions": "Actions",
@@ -161,7 +178,10 @@
     "settled": "Settled",
     "paid_externally": "Paid outside Trazza",
     "waived": "Waived",
-    "disputed": "Disputed"
+    "disputed": "Disputed",
+    "inactive": "Inactive",
+    "submitted": "Submitted",
+    "validated": "Validated"
   },
   "cargo-types": {
     "general": "General",
@@ -235,7 +255,19 @@
     "pending-verification": "Verification pending",
     "rating": "Rating",
     "ratings-count": "Ratings",
-    "saved": "Profile updated."
+    "saved": "Profile updated.",
+    "account": "Account",
+    "add-carrier-role": "Add carrier role",
+    "add-merchant-role": "Add merchant role",
+    "become-carrier": "I also have trucks",
+    "become-carrier-hint": "Add the carrier role to publish return routes.",
+    "become-merchant": "I also send cargo",
+    "business": "Business",
+    "contact": "Contact",
+    "identity": "Identity",
+    "roles": "Roles",
+    "verify-hint": "We check your DNI against RENIEC.",
+    "verify-identity": "Validate identity"
   },
   "vehicle": {
     "list-title": "My vehicles",
@@ -255,7 +287,13 @@
     "deactivate": "Deactivate",
     "confirm-delete": "Delete the vehicle {plate}?",
     "empty-title": "You have no vehicles yet",
-    "empty-content": "Add a vehicle to start publishing return routes."
+    "empty-content": "Add a vehicle to start publishing return routes.",
+    "confirm-deactivate": "Deactivate the truck {plate}?",
+    "edit": "Edit truck",
+    "empty": "No trucks yet.",
+    "subtitle": "Trucks you use on your routes.",
+    "title": "Trucks",
+    "volume-auto": "Leave empty to compute it from the dimensions."
   },
   "return-route": {
     "list-title": "My return routes",
@@ -761,5 +799,24 @@
     "confirm-paid": "Confirm payment",
     "waive": "Waive",
     "dispute": "Dispute"
+  },
+  "driver": {
+    "add": "Add driver",
+    "deactivate": "Deactivate",
+    "edit": "Edit driver",
+    "empty": "No drivers yet.",
+    "sex-f": "Female",
+    "sex-m": "Male",
+    "sex-none": "Prefer not to say",
+    "sex-x": "Other",
+    "subtitle": "People who drive your trucks.",
+    "title": "Drivers"
+  },
+  "saved-address": {
+    "add": "Add address",
+    "empty": "No saved addresses.",
+    "label-placeholder": "Warehouse, Home…",
+    "subtitle": "Places you use often.",
+    "title": "Saved addresses"
   }
 }

@@ -93,7 +93,7 @@ const publishRoute = async () => {
     </div>
     <pv-message v-if="!vehicles.length" severity="warn" class="mb-3">
       {{ t('return-route.no-vehicles') }}
-      <router-link :to="{ name: 'iam-vehicle-new' }" class="font-semibold underline ml-1">{{ t('vehicle.add') }}</router-link>
+      <router-link :to="{ name: 'iam-vehicles' }" class="font-semibold underline ml-1">{{ t('vehicle.add') }}</router-link>
     </pv-message>
     <pv-message v-if="limitReached" severity="warn" class="mb-3">
       {{ t('billing.limit-reached') }}
