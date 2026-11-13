@@ -30,7 +30,7 @@ const loadContexts = async () => {
   const loads = [
     [iamStore, store => store.refreshAccount()],
     [useMatchmakingStore(), store => store.fetchAll(iamStore.activeRole.value)],
-    [useExecutionStore(), store => store.fetchShipments()],
+    [useExecutionStore(), store => store.fetchTrips()],
     [useBillingStore(), store => Promise.all([store.fetchPlans(), store.fetchSubscriptions(), store.fetchSettlements()])],
     [useReputationStore(), store => store.fetchRatings()]
   ];
