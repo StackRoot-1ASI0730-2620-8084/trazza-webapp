@@ -3,6 +3,7 @@ import {computed} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRouter} from "vue-router";
 import useIamStore from "../../../iam/application/iam.store.js";
+import {UserRole} from "../../../iam/domain/model/user-role.value-object.js";
 
 const emit = defineEmits(['navigate']);
 const { t } = useI18n();
@@ -12,36 +13,49 @@ const iamStore = useIamStore();
 const carrierItems = [
   { label: 'option.dashboard',        icon: 'pi pi-home',          to: { name: 'dashboard' } },
   { label: 'option.return-routes',    icon: 'pi pi-directions',    to: { name: 'matchmaking-return-routes' } },
-  { label: 'option.load-suggestions', icon: 'pi pi-box',           to: { name: 'matchmaking-load-suggestions' } },
-  { label: 'option.offers',           icon: 'pi pi-comments',      to: { name: 'matchmaking-offers' } },
-  { label: 'option.active-trip',      icon: 'pi pi-truck',         to: { name: 'execution-active-trip' } },
-  { label: 'option.trip-history',     icon: 'pi pi-history',       to: { name: 'execution-trip-history' } },
+  { label: 'option.open-shipments',   icon: 'pi pi-box',           to: { name: 'matchmaking-open-shipments' } },
+  { label: 'option.proposals',        icon: 'pi pi-comments',      to: { name: 'matchmaking-proposals' } },
+  { label: 'option.trips',            icon: 'pi pi-truck',         to: { name: 'execution-trips' } },
   { label: 'option.vehicles',         icon: 'pi pi-car',           to: { name: 'iam-vehicles' } },
+  { label: 'option.drivers',          icon: 'pi pi-id-card',       to: { name: 'iam-drivers' } },
+  { label: 'option.iot-devices',      icon: 'pi pi-wifi',          to: { name: 'execution-iot-devices' } },
   { label: 'option.ratings',          icon: 'pi pi-star',          to: { name: 'reputation-ratings' } },
-  { label: 'option.plan-billing',     icon: 'pi pi-credit-card',   to: { name: 'billing-plan' } },
+  { label: 'option.plan-billing',     icon: 'pi pi-credit-card',   to: { name: 'billing-plans' } },
+  { label: 'option.saved-addresses',  icon: 'pi pi-bookmark',      to: { name: 'iam-saved-addresses' } },
   { label: 'option.profile',          icon: 'pi pi-user',          to: { name: 'iam-profile' } }
 ];
 
 const merchantItems = [
   { label: 'option.dashboard',          icon: 'pi pi-home',        to: { name: 'dashboard' } },
-  { label: 'option.freight-requests',   icon: 'pi pi-box',         to: { name: 'matchmaking-freight-requests' } },
-  { label: 'option.find-carriers',      icon: 'pi pi-search',      to: { name: 'matchmaking-find-carriers' } },
-  { label: 'option.offers',             icon: 'pi pi-comments',    to: { name: 'matchmaking-offers' } },
-  { label: 'option.shipment-tracking',  icon: 'pi pi-map-marker',  to: { name: 'execution-shipment-tracking' } },
-  { label: 'option.shipment-history',   icon: 'pi pi-history',     to: { name: 'execution-shipment-history' } },
+  { label: 'option.shipment-requests',  icon: 'pi pi-box',         to: { name: 'matchmaking-shipment-requests' } },
+  { label: 'option.proposals',          icon: 'pi pi-comments',    to: { name: 'matchmaking-proposals' } },
+  { label: 'option.trips',              icon: 'pi pi-map-marker',  to: { name: 'execution-trips' } },
   { label: 'option.ratings',            icon: 'pi pi-star',        to: { name: 'reputation-ratings' } },
-  { label: 'option.plan-billing',       icon: 'pi pi-credit-card', to: { name: 'billing-plan' } },
+  { label: 'option.plan-billing',       icon: 'pi pi-credit-card', to: { name: 'billing-settlements' } },
+  { label: 'option.saved-addresses',    icon: 'pi pi-bookmark',    to: { name: 'iam-saved-addresses' } },
   { label: 'option.profile',            icon: 'pi pi-user',        to: { name: 'iam-profile' } }
 ];
 
 const items = computed(() => iamStore.isCarrier.value ? carrierItems : merchantItems);
 const accountLabel = computed(() => iamStore.isCarrier.value ? t('menu.carrier-account') : t('menu.merchant-account'));
+const otherRole = computed(() => {
+  const user = iamStore.state.currentUser;
+  if (!user?.hasBothRoles) return null;
+  return iamStore.isCarrier.value ? UserRole.MERCHANT : UserRole.CARRIER;
+});
+
+/** Switches to the other role of the account and goes to its dashboard. */
+const switchRole = () => {
+  iamStore.switchRole(otherRole.value);
+  emit('navigate');
+  router.push({ name: 'dashboard' });
+};
 
 /**
  * Signs the user out and returns to the sign-in page.
  */
-const signOut = () => {
-  iamStore.signOut();
+const signOut = async () => {
+  await iamStore.signOut();
   emit('navigate');
   router.push({ name: 'iam-sign-in' });
 };
@@ -63,6 +77,10 @@ const signOut = () => {
       </li>
     </ul>
     <div class="px-3 pb-3 flex flex-column gap-1">
+      <a v-if="otherRole" href="#" class="menu-link" @click.prevent="switchRole">
+        <i class="pi pi-sync"></i>
+        <span>{{ t('menu.switch-to', { role: t(`roles.${otherRole.toLowerCase()}`) }) }}</span>
+      </a>
       <a href="#" class="menu-link" @click.prevent="signOut">
         <i class="pi pi-sign-out"></i>
         <span>{{ t('menu.sign-out') }}</span>

@@ -3,6 +3,9 @@ import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
 const usersEndpointPath = import.meta.env.VITE_USERS_ENDPOINT_PATH;
 const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_PATH;
+const vehiclesEndpointPath = import.meta.env.VITE_VEHICLES_ENDPOINT_PATH ?? '/vehicles';
+const driversEndpointPath = import.meta.env.VITE_DRIVERS_ENDPOINT_PATH ?? '/drivers';
+const savedAddressesEndpointPath = import.meta.env.VITE_SAVED_ADDRESSES_ENDPOINT_PATH ?? '/saved-addresses';
 
 /**
  * Infrastructure gateway for the IAM endpoints.
@@ -11,17 +14,19 @@ const authenticationEndpointPath = import.meta.env.VITE_AUTHENTICATION_ENDPOINT_
  * @extends BaseApi
  */
 export class IamApi extends BaseApi {
-    /** Creates the endpoint client for users. */
+    /** Creates the endpoint clients of the carrier fleet and of the saved addresses. */
     constructor() {
         super();
-        this._usersEndpoint = new BaseEndpoint(this, usersEndpointPath);
+        this.vehicles = new BaseEndpoint(this, vehiclesEndpointPath);
+        this.drivers = new BaseEndpoint(this, driversEndpointPath);
+        this.savedAddresses = new BaseEndpoint(this, savedAddressesEndpointPath);
     }
 
     /**
      * Authenticates a user against the Trazza Platform API.
      *
      * @param {import('../domain/commands/sign-in.command.js').SignInCommand} signInCommand - Sign-in command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the user resource and its bearer token.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the session tokens and the account.
      */
     signIn(signInCommand) {
         return this.http.post(`${authenticationEndpointPath}/sign-in`, {
@@ -34,33 +39,79 @@ export class IamApi extends BaseApi {
      * Registers a new user from a sign-up command.
      *
      * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created user and its bearer token.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the session tokens and the created account.
      */
     signUp(signUpCommand) {
         return this.http.post(`${authenticationEndpointPath}/sign-up`, {
-            fullName: signUpCommand.fullName,
             email: signUpCommand.email,
+            password: signUpCommand.password,
+            fullName: signUpCommand.fullName,
+            dni: signUpCommand.dni,
             phone: signUpCommand.phone,
-            role: signUpCommand.role,
-            password: signUpCommand.password
+            roles: [signUpCommand.role],
+            merchant: signUpCommand.isMerchant
+                ? { businessName: signUpCommand.businessName, ruc: signUpCommand.ruc, businessType: signUpCommand.businessType }
+                : null
         });
     }
 
     /**
-     * @param {number} id - User identifier.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the user.
+     * Revokes the refresh token of the session.
+     *
+     * @param {string} refreshToken - Refresh token to revoke.
+     * @returns {Promise<import('axios').AxiosResponse>} Empty response.
      */
-    getUserById(id) {
-        return this._usersEndpoint.getById(id);
+    signOut(refreshToken) {
+        return this.http.post(`${authenticationEndpointPath}/sign-out`, { refreshToken });
     }
 
     /**
-     * Updates the contact data (full name and phone) of a user.
-     *
-     * @param {Object} resource - User resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated user.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the account of the signed-in user.
      */
-    updateUser(resource) {
-        return this._usersEndpoint.update(resource.id, { fullName: resource.fullName, phone: resource.phone });
+    getMe() {
+        return this.http.get(`${usersEndpointPath}/me`);
+    }
+
+    /**
+     * Updates the contact data (full name and phone) of the signed-in user.
+     *
+     * @param {{fullName: string, phone: string}} resource - Identity resource.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    updateIdentity(resource) {
+        return this.http.put(`${usersEndpointPath}/me/identity`, { fullName: resource.fullName, phone: resource.phone });
+    }
+
+    /**
+     * Adds the carrier or the merchant role to the account. The merchant role needs the business data.
+     *
+     * @param {{role: string, merchant: ?Object}} resource - Role resource.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    addRole(resource) {
+        return this.http.post(`${usersEndpointPath}/me/roles`, resource);
+    }
+
+    /**
+     * @param {{businessName: string, businessType: string}} resource - Business data (the RUC cannot change).
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated account.
+     */
+    updateMerchantProfile(resource) {
+        return this.http.put(`${usersEndpointPath}/me/merchant-profile`, resource);
+    }
+
+    /** @returns {Promise<import('axios').AxiosResponse>} Response with the identity checks of the user. */
+    listIdentityVerifications() {
+        return this.http.get(`${usersEndpointPath}/me/identity-verifications`);
+    }
+
+    /**
+     * Sends the identity check to the simulated RENIEC provider.
+     *
+     * @param {{documentFrontS3Key: ?string, documentBackS3Key: ?string}} resource - Document photos, optional.
+     * @returns {Promise<import('axios').AxiosResponse>} Response with the created check.
+     */
+    submitIdentityVerification(resource) {
+        return this.http.post(`${usersEndpointPath}/me/identity-verifications`, resource);
     }
 }

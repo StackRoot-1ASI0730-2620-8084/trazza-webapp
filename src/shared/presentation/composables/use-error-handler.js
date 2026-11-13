@@ -15,9 +15,13 @@ export function useErrorHandler() {
      * @returns {string} Translated message.
      */
     const describeError = error => {
+        const problem = error?.response?.data;
+        if (problem?.code && te(`api-errors.${problem.code}`)) return t(`api-errors.${problem.code}`);
+        if (problem?.detail) return problem.detail;
+        if (problem?.errors) return t('errors.invalid-request');
         const key = error?.message ?? '';
         if (te(key)) return t(key);
-        if (error?.isAxiosError) return t('errors.network');
+        if (error?.isAxiosError) return t(error.response ? 'errors.server' : 'errors.network');
         return t('errors.unexpected');
     };
 

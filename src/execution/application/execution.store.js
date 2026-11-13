@@ -1,221 +1,111 @@
 import {computed, reactive} from "vue";
 import {ExecutionApi} from "../infrastructure/execution-api.js";
-import {ShipmentAssembler} from "../infrastructure/shipment.assembler.js";
-import {Shipment} from "../domain/model/shipment.entity.js";
-import {Incident} from "../domain/model/incident.entity.js";
-import {IncidentType} from "../domain/model/incident-type.value-object.js";
-import {GeoLocation} from "../../shared/domain/model/geo-location.value-object.js";
-import useIamStore from "../../iam/application/iam.store.js";
-import useNotificationStore from "../../shared/application/notification.store.js";
+import {DeviationAlert, Incident, IotDevice, TrackingPoint, Trip} from "../domain/model/execution.entities.js";
 
-const executionApi = new ExecutionApi();
+const api = new ExecutionApi();
 
 /**
- * Reactive state of the Service Execution & Monitoring bounded context.
- *
- * @type {{shipments: Shipment[], loaded: boolean, errors: Error[]}}
+ * Reactive state of the Service Execution &amp; Monitoring bounded context.
  */
 const state = reactive({
-    shipments: [],
-    loaded: false,
-    errors: []
+    trips: [],
+    iotDevices: [],
+    loaded: false
 });
 
-/** @returns {?number} Identifier of the signed-in user. */
-const currentUserId = () => useIamStore().currentUserId.value;
+const activeTrips = computed(() => state.trips.filter(trip => trip.isActive));
+const openAlerts = computed(() => state.trips.reduce((total, trip) => total + (trip.openAlerts ?? 0), 0));
 
-/** @type {import('vue').ComputedRef<Shipment[]>} Shipments of the signed-in user, newest first. */
-const myShipments = computed(() => state.shipments
-    .filter(shipment => shipment.involves(currentUserId()))
-    .sort((a, b) => (b.createdAt ?? '').localeCompare(a.createdAt ?? '')));
+const replace = trip => {
+    state.trips = state.trips.some(item => item.id === trip.id)
+        ? state.trips.map(item => item.id === trip.id ? trip : item)
+        : [trip, ...state.trips];
+    return trip;
+};
 
-/** @type {import('vue').ComputedRef<Shipment[]>} Active shipments of the signed-in user. */
-const myActiveShipments = computed(() => myShipments.value.filter(shipment => shipment.status.isActive));
+async function fetchTrips() {
+    state.trips = (await api.listTrips()).data.map(resource => new Trip(resource));
+    state.loaded = true;
+}
 
-/** @type {import('vue').ComputedRef<Shipment[]>} Delivered, closed or cancelled shipments of the signed-in user. */
-const myFinishedShipments = computed(() => myShipments.value.filter(shipment => !shipment.status.isActive));
+async function getTrip(id) {
+    return replace(new Trip((await api.getTrip(id)).data));
+}
 
-/**
- * Loads every shipment.
- *
- * @returns {Promise<void>}
- */
-async function fetchShipments() {
-    try {
-        state.shipments = ShipmentAssembler.toEntitiesFromResponse(await executionApi.getShipments());
-        state.loaded = true;
-        state.errors = [];
-    } catch (error) {
-        state.errors.push(error);
-    }
+async function getHistory(id) {
+    return (await api.getHistory(id)).data;
+}
+
+async function assignDriver(trip, driverId) {
+    return replace(new Trip((await api.assignDriver(trip.id, driverId)).data));
 }
 
 /**
- * @param {number|string} id - Shipment identifier.
- * @returns {Shipment|undefined} Shipment.
+ * Moves a trip forward.
+ * @param {Trip} trip - Trip.
+ * @param {'pick-up'|'deliver'|'confirm'} action - Action allowed for the role.
  */
-function getShipmentById(id) {
-    return state.shipments.find(shipment => shipment.id === Number(id));
+async function runAction(trip, action) {
+    return replace(new Trip((await api.runAction(trip.id, action)).data));
+}
+
+async function cancelTrip(trip, reason) {
+    return replace(new Trip((await api.cancel(trip.id, reason)).data));
+}
+
+async function listTrackingPoints(tripId) {
+    return (await api.listTrackingPoints(tripId)).data.map(resource => new TrackingPoint(resource));
 }
 
 /**
- * Persists a shipment and reloads the collection when the request fails.
- *
- * @param {Shipment} shipment - Shipment to persist.
- * @returns {Promise<void>}
+ * Sends the current position of the carrier's phone.
+ * @returns {Promise<{point: TrackingPoint, alert: ?DeviationAlert, tripStatus: string}>}
  */
-async function persist(shipment) {
-    try {
-        await executionApi.updateShipment(ShipmentAssembler.toResourceFromEntity(shipment));
-    } catch (error) {
-        state.errors.push(error);
-        await fetchShipments();
-        throw error;
-    }
+async function recordTrackingPoint(tripId, { latitude, longitude, speedKmh = null }) {
+    const { data } = await api.recordTrackingPoint(tripId, { latitude, longitude, speedKmh, source: 'PHONE' });
+    return { point: new TrackingPoint(data.point), alert: data.alert ? new DeviationAlert(data.alert) : null, tripStatus: data.tripStatus };
 }
 
-/**
- * Opens a shipment for a confirmed match. Called by the Matchmaking context.
- *
- * @param {Object} data - Snapshot of the match (see {@link Shipment} constructor).
- * @returns {Promise<Shipment>} Created shipment.
- */
-async function openShipment(data) {
-    const shipment = Shipment.open(data);
-    const response = await executionApi.createShipment(ShipmentAssembler.toResourceFromEntity(shipment));
-    const created = ShipmentAssembler.toEntityFromResource(response.data);
-    state.shipments.push(created);
-    return created;
+async function listAlerts(tripId) {
+    return (await api.listAlerts(tripId)).data.map(resource => new DeviationAlert(resource));
 }
 
-/**
- * Registers the pickup of the goods.
- *
- * @param {Shipment} shipment - Shipment.
- * @returns {Promise<void>}
- */
-async function confirmPickup(shipment) {
-    shipment.confirmPickup();
-    await persist(shipment);
+async function acknowledgeAlert(tripId, alertId) {
+    await api.acknowledgeAlert(tripId, alertId);
 }
 
-/**
- * Shares a new location of the vehicle. Without GPS hardware the location advances towards the
- * delivery point and may deviate from the planned route to exercise the deviation alerts.
- *
- * @param {Shipment} shipment - Shipment in transit.
- * @param {?GeoLocation} [location=null] - Real location; when null a simulated one is used.
- * @returns {Promise<?string>} Event raised by the update.
- */
-async function shareLocation(shipment, location = null) {
-    const nextLocation = location ?? simulateNextLocation(shipment);
-    const event = shipment.updateLocation(nextLocation);
-    await persist(shipment);
-    if (event === 'detour_alert') {
-        useNotificationStore().notify({
-            severity: 'warn',
-            summaryKey: 'alerts.detour',
-            params: { code: shipment.code, distance: shipment.deviationKm }
-        });
-    }
-    return event;
+async function listIncidents(tripId) {
+    return (await api.listIncidents(tripId)).data.map(resource => new Incident(resource));
 }
 
-/**
- * Calculates a simulated next location for a shipment.
- *
- * @param {Shipment} shipment - Shipment in transit.
- * @returns {GeoLocation} Next location.
- */
-function simulateNextLocation(shipment) {
-    const from = shipment.currentLocation ?? shipment.pickup.location;
-    const target = shipment.delivery.location;
-    if (from.distanceTo(target) < 0.5) return target;
-    const advanced = from.moveTowards(target, 0.45);
-    const deviate = Math.random() < 0.3;
-    const offset = deviate ? 0.025 : (Math.random() - 0.5) * 0.004;
-    return new GeoLocation({ latitude: advanced.latitude + offset, longitude: advanced.longitude - offset });
+async function reportIncident(tripId, { type, description }) {
+    const text = (description ?? '').trim();
+    if (!Incident.TYPES.includes(type)) throw new Error('validation.incident-type');
+    if (!text) throw new Error('validation.description-required');
+    return new Incident((await api.reportIncident(tripId, { type, description: text })).data);
 }
 
-/**
- * Registers the delivery of the goods.
- *
- * @param {Shipment} shipment - Shipment in transit.
- * @param {boolean} [acknowledgeDistance=false] - Carrier confirms despite being far from the delivery point.
- * @returns {Promise<void>}
- */
-async function confirmDelivery(shipment, acknowledgeDistance = false) {
-    shipment.confirmDelivery({ acknowledgeDistance });
-    await persist(shipment);
+async function addEvidence(tripId, incidentId, s3Key) {
+    if (!(s3Key ?? '').trim()) throw new Error('validation.evidence-required');
+    return (await api.addEvidence(tripId, incidentId, s3Key.trim())).data;
 }
 
-/**
- * Registers that the merchant received the goods.
- *
- * @param {Shipment} shipment - Delivered shipment.
- * @returns {Promise<void>}
- */
-async function confirmReception(shipment) {
-    shipment.confirmReception();
-    await persist(shipment);
+async function resolveIncident(tripId, incidentId, resolution) {
+    if (!(resolution ?? '').trim()) throw new Error('validation.resolution-required');
+    return new Incident((await api.resolveIncident(tripId, incidentId, resolution.trim())).data);
 }
 
-/**
- * Cancels a shipment before pickup.
- *
- * @param {Shipment} shipment - Shipment.
- * @returns {Promise<void>}
- */
-async function cancelShipment(shipment) {
-    shipment.cancel();
-    await persist(shipment);
-}
-
-/**
- * Reports an incident on a shipment.
- *
- * @param {Shipment} shipment - Shipment.
- * @param {Object} form - Incident form data.
- * @param {string} form.type - Incident type.
- * @param {string} form.description - What happened.
- * @returns {Promise<Incident>} Reported incident.
- */
-async function reportIncident(shipment, { type, description }) {
-    const iamStore = useIamStore();
-    const incident = shipment.reportIncident(new Incident({
-        type: new IncidentType(type),
-        description,
-        reporterId: iamStore.currentUserId.value,
-        reporterRole: iamStore.currentRole.value,
-        reportedAt: new Date().toISOString()
-    }));
-    await persist(shipment);
-    useNotificationStore().notify({ severity: 'warn', summaryKey: 'alerts.incident-reported', params: { code: shipment.code } });
-    return incident;
+async function fetchIotDevices() {
+    state.iotDevices = (await api.listIotDevices()).data.map(resource => new IotDevice(resource));
 }
 
 const executionStore = {
-    state,
-    myShipments,
-    myActiveShipments,
-    myFinishedShipments,
-    fetchShipments,
-    getShipmentById,
-    openShipment,
-    confirmPickup,
-    shareLocation,
-    confirmDelivery,
-    confirmReception,
-    cancelShipment,
-    reportIncident
+    state, activeTrips, openAlerts, fetchTrips, getTrip, getHistory, assignDriver, runAction, cancelTrip,
+    listTrackingPoints, recordTrackingPoint, listAlerts, acknowledgeAlert, listIncidents, reportIncident,
+    addEvidence, resolveIncident, fetchIotDevices
 };
 
-/**
- * Application service store for the Service Execution & Monitoring bounded context.
- * It coordinates pickup, live tracking, deviation alerts, delivery, reception and incidents.
- *
- * @returns {typeof executionStore} Store state, getters and actions.
- */
+/** @returns {typeof executionStore} Application service store of Execution. */
 const useExecutionStore = () => executionStore;
 
 export default useExecutionStore;

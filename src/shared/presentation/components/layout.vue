@@ -1,36 +1,59 @@
 <script setup>
 import {computed, ref, watch} from "vue";
-import {useRoute} from "vue-router";
+import {useRoute, useRouter} from "vue-router";
 import {useI18n} from "vue-i18n";
 import SideMenu from "./side-menu.vue";
 import TopBar from "./top-bar.vue";
 import LanguageSwitcher from "./language-switcher.vue";
 import useIamStore from "../../../iam/application/iam.store.js";
-import useProfileStore from "../../../iam/application/profile.store.js";
 import useMatchmakingStore from "../../../matchmaking/application/matchmaking.store.js";
 import useExecutionStore from "../../../execution/application/execution.store.js";
 import useBillingStore from "../../../billing/application/billing.store.js";
 import useReputationStore from "../../../reputation/application/reputation.store.js";
+import {useErrorHandler} from "../composables/use-error-handler.js";
 
 const { t } = useI18n();
 const route = useRoute();
+const router = useRouter();
 const iamStore = useIamStore();
+const { showError } = useErrorHandler();
 const drawer = ref(false);
 
 const isPublicRoute = computed(() => route.meta?.public === true);
 
 /**
  * Loads the data of every bounded context once a session is available.
+ * Endpoints that the platform does not expose yet (404 or 5xx) fail quietly;
+ * only a request without response (no connection) is reported to the user.
  */
-const loadContexts = () => {
-  useProfileStore().fetchProfiles();
-  useMatchmakingStore().fetchAll();
-  useExecutionStore().fetchShipments();
-  useBillingStore().fetchBilling();
-  useReputationStore().fetchRatings();
+const loadContexts = async () => {
+  const loads = [
+    [iamStore, store => store.refreshAccount()],
+    [useMatchmakingStore(), store => store.fetchAll(iamStore.activeRole.value)],
+    [useExecutionStore(), store => store.fetchTrips()],
+    [useBillingStore(), store => Promise.all([store.fetchPlans(), store.fetchSubscriptions(), store.fetchSettlements()])],
+    [useReputationStore(), store => store.fetchRatings()]
+  ];
+  const errors = (await Promise.all(loads.map(async ([store, load]) => {
+    const previousCount = store.state?.errors?.length ?? 0;
+    try {
+      await load(store);
+    } catch (error) {
+      return [error];
+    }
+    return store.state?.errors?.slice(previousCount) ?? [];
+  }))).flat();
+
+  const connectionError = errors.find(error => error?.isAxiosError && !error.response);
+  if (connectionError) showError(connectionError);
+  else if (errors.length) console.warn('Some Trazza modules are not available yet:', errors.map(error => error?.message));
 };
 
-watch(() => iamStore.isSignedIn.value, signedIn => { if (signedIn) loadContexts(); }, { immediate: true });
+// When the session ends (sign-out, or a refresh token that is no longer valid) the user returns to sign-in.
+watch(() => [iamStore.isSignedIn.value, iamStore.activeRole.value], ([signedIn]) => {
+  if (signedIn) loadContexts();
+  else if (!isPublicRoute.value) router.push({ name: 'iam-sign-in' });
+}, { immediate: true });
 </script>
 
 <template>

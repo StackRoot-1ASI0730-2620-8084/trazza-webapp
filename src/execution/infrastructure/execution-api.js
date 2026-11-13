@@ -1,47 +1,40 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
-import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
-const shipmentsEndpointPath = import.meta.env.VITE_SHIPMENTS_ENDPOINT_PATH;
+const tripsPath = import.meta.env.VITE_TRIPS_ENDPOINT_PATH ?? '/trips';
+const iotDevicesPath = import.meta.env.VITE_IOT_DEVICES_ENDPOINT_PATH ?? '/iot-devices';
 
 /**
- * Infrastructure gateway for the Service Execution & Monitoring bounded context endpoints.
- *
+ * Gateway to the Service Execution &amp; Monitoring bounded context.
  * @class ExecutionApi
- * @extends BaseApi
  */
 export class ExecutionApi extends BaseApi {
-    /** Creates the endpoint client for shipments. */
-    constructor() {
-        super();
-        this._shipmentsEndpoint = new BaseEndpoint(this, shipmentsEndpointPath);
-    }
+    listTrips() { return this.http.get(tripsPath); }
 
-    /** @returns {Promise<import('axios').AxiosResponse>} Response with every shipment. */
-    getShipments() {
-        return this._shipmentsEndpoint.getAll();
-    }
+    getTrip(id) { return this.http.get(`${tripsPath}/${id}`); }
 
-    /**
-     * @param {number} id - Shipment identifier.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the shipment.
-     */
-    getShipmentById(id) {
-        return this._shipmentsEndpoint.getById(id);
-    }
+    getHistory(id) { return this.http.get(`${tripsPath}/${id}/status-history`); }
 
-    /**
-     * @param {Object} resource - Shipment resource.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created shipment.
-     */
-    createShipment(resource) {
-        return this._shipmentsEndpoint.create(resource);
-    }
+    assignDriver(id, driverId) { return this.http.put(`${tripsPath}/${id}/driver`, { driverId }); }
 
-    /**
-     * @param {Object} resource - Shipment resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated shipment.
-     */
-    updateShipment(resource) {
-        return this._shipmentsEndpoint.update(resource.id, resource);
-    }
+    runAction(id, action) { return this.http.post(`${tripsPath}/${id}/${action}`); }
+
+    cancel(id, reason) { return this.http.post(`${tripsPath}/${id}/cancel`, { reason }); }
+
+    listTrackingPoints(id) { return this.http.get(`${tripsPath}/${id}/tracking-points`); }
+
+    recordTrackingPoint(id, point) { return this.http.post(`${tripsPath}/${id}/tracking-points`, point); }
+
+    listAlerts(id) { return this.http.get(`${tripsPath}/${id}/deviation-alerts`); }
+
+    acknowledgeAlert(id, alertId) { return this.http.post(`${tripsPath}/${id}/deviation-alerts/${alertId}/acknowledge`); }
+
+    listIncidents(id) { return this.http.get(`${tripsPath}/${id}/incidents`); }
+
+    reportIncident(id, resource) { return this.http.post(`${tripsPath}/${id}/incidents`, resource); }
+
+    addEvidence(id, incidentId, s3Key) { return this.http.post(`${tripsPath}/${id}/incidents/${incidentId}/evidences`, { s3Key }); }
+
+    resolveIncident(id, incidentId, resolution) { return this.http.post(`${tripsPath}/${id}/incidents/${incidentId}/resolve`, { resolution }); }
+
+    listIotDevices() { return this.http.get(iotDevicesPath); }
 }

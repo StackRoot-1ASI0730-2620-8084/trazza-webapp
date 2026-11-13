@@ -4,6 +4,7 @@ import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import useIamStore from "../../application/iam.store.js";
 import {SignUpCommand} from "../../domain/commands/sign-up.command.js";
+import {UserRole} from "../../domain/model/user-role.value-object.js";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 
 const { t } = useI18n();
@@ -14,22 +15,24 @@ const { describeError } = useErrorHandler();
 const errorMessage = ref('');
 
 const form = reactive({
-  role: route.query.role === 'merchant' ? 'merchant' : 'carrier',
+  role: route.query.role?.toUpperCase() === UserRole.MERCHANT ? UserRole.MERCHANT : UserRole.CARRIER,
   fullName: '',
   businessName: '',
+  businessType: '',
   email: '',
   phone: '',
-  documentNumber: '',
+  dni: '',
+  ruc: '',
   password: '',
   confirmPassword: '',
   acceptedTerms: false
 });
 
-const isMerchant = computed(() => form.role === 'merchant');
+const isMerchant = computed(() => form.role === UserRole.MERCHANT);
 
 const roles = [
-  { value: 'carrier', title: 'sign-up.carrier-title', description: 'sign-up.carrier-description', icon: 'pi pi-truck' },
-  { value: 'merchant', title: 'sign-up.merchant-title', description: 'sign-up.merchant-description', icon: 'pi pi-shop' }
+  { value: UserRole.CARRIER, title: 'sign-up.carrier-title', description: 'sign-up.carrier-description', icon: 'pi pi-truck' },
+  { value: UserRole.MERCHANT, title: 'sign-up.merchant-title', description: 'sign-up.merchant-description', icon: 'pi pi-shop' }
 ];
 
 /**
@@ -53,8 +56,8 @@ const performSignUp = async () => {
     <form class="flex flex-column gap-3" @submit.prevent="performSignUp">
       <div class="grid m-0">
         <div v-for="role in roles" :key="role.value" class="col-12 md:col-6 p-1">
-          <label :for="`role-${role.value}`" class="role-option flex gap-3 p-3 cursor-pointer" :class="{ 'role-selected': form.role === role.value }">
-            <pv-radio-button v-model="form.role" :input-id="`role-${role.value}`" name="role" :value="role.value"/>
+          <label :for="`role-${role.value.toLowerCase()}`" class="role-option flex gap-3 p-3 cursor-pointer" :class="{ 'role-selected': form.role === role.value }">
+            <pv-radio-button v-model="form.role" :input-id="`role-${role.value.toLowerCase()}`" name="role" :value="role.value"/>
             <div>
               <div class="font-semibold"><i :class="role.icon" class="mr-2"></i>{{ t(role.title) }}</div>
               <div class="text-sm trazza-muted">{{ t(role.description) }}</div>
@@ -63,13 +66,14 @@ const performSignUp = async () => {
         </div>
       </div>
       <div class="grid">
-        <div class="col-12" :class="{ 'md:col-6': isMerchant }">
+        <div class="col-12 md:col-6">
           <label for="fullName" class="trazza-label">{{ t('fields.full-name') }} *</label>
           <pv-input-text id="fullName" v-model="form.fullName" class="w-full"/>
         </div>
-        <div v-if="isMerchant" class="col-12 md:col-6">
-          <label for="businessName" class="trazza-label">{{ t('fields.business-name') }} *</label>
-          <pv-input-text id="businessName" v-model="form.businessName" class="w-full"/>
+        <div class="col-12 md:col-6">
+          <label for="dni" class="trazza-label">{{ t('fields.dni') }} *</label>
+          <pv-input-text id="dni" v-model="form.dni" :placeholder="t('sign-up.dni-placeholder')" class="w-full"/>
+          <small class="trazza-muted">{{ t('sign-up.dni-hint') }}</small>
         </div>
         <div class="col-12 md:col-6">
           <label for="email" class="trazza-label">{{ t('fields.email') }} *</label>
@@ -79,11 +83,21 @@ const performSignUp = async () => {
           <label for="phone" class="trazza-label">{{ t('fields.phone') }} *</label>
           <pv-input-text id="phone" v-model="form.phone" placeholder="+51 9__ ___ ___" class="w-full"/>
         </div>
-        <div class="col-12">
-          <label for="document" class="trazza-label">{{ isMerchant ? t('fields.ruc') : t('fields.dni') }} *</label>
-          <pv-input-text id="document" v-model="form.documentNumber" :placeholder="isMerchant ? t('sign-up.ruc-placeholder') : t('sign-up.dni-placeholder')" class="w-full"/>
-          <small class="trazza-muted">{{ isMerchant ? t('sign-up.ruc-hint') : t('sign-up.dni-hint') }}</small>
-        </div>
+        <template v-if="isMerchant">
+          <div class="col-12 md:col-6">
+            <label for="businessName" class="trazza-label">{{ t('fields.business-name') }} *</label>
+            <pv-input-text id="businessName" v-model="form.businessName" class="w-full"/>
+          </div>
+          <div class="col-12 md:col-6">
+            <label for="businessType" class="trazza-label">{{ t('fields.business-type') }} *</label>
+            <pv-input-text id="businessType" v-model="form.businessType" :placeholder="t('sign-up.business-type-placeholder')" class="w-full"/>
+          </div>
+          <div class="col-12">
+            <label for="ruc" class="trazza-label">{{ t('fields.ruc') }} *</label>
+            <pv-input-text id="ruc" v-model="form.ruc" :placeholder="t('sign-up.ruc-placeholder')" class="w-full"/>
+            <small class="trazza-muted">{{ t('sign-up.ruc-hint') }}</small>
+          </div>
+        </template>
         <div class="col-12 md:col-6">
           <label for="password" class="trazza-label">{{ t('fields.password') }} *</label>
           <pv-password input-id="password" v-model="form.password" toggle-mask fluid :prompt-label="t('sign-up.password-prompt')" :weak-label="t('sign-up.password-weak')" :medium-label="t('sign-up.password-medium')" :strong-label="t('sign-up.password-strong')"/>

@@ -18,29 +18,34 @@ export class SignUpCommand {
 
     /**
      * @param {Object} params - Command attributes.
-     * @param {string} params.role - "carrier" or "merchant".
+     * @param {string} params.role - CARRIER or MERCHANT.
      * @param {string} params.fullName - Full name of the person.
      * @param {string} [params.businessName=''] - Business name (merchants only).
+     * @param {string} [params.businessType=''] - Type of business (merchants only).
      * @param {string} params.email - E-mail.
      * @param {string} params.phone - Mobile phone.
-     * @param {string} params.documentNumber - DNI for carriers or RUC for merchants.
+     * @param {string} params.dni - DNI of the person.
+     * @param {string} [params.ruc=''] - RUC of the business (merchants only).
      * @param {string} params.password - Password.
      * @param {string} params.confirmPassword - Password confirmation.
      * @param {boolean} params.acceptedTerms - Terms and privacy policy acceptance.
      * @throws {Error} When a business rule of the registration is violated.
      */
-    constructor({ role, fullName, businessName = '', email, phone, documentNumber, password, confirmPassword, acceptedTerms }) {
+    constructor({ role, fullName, businessName = '', businessType = '', email, phone, dni, ruc = '', password, confirmPassword, acceptedTerms }) {
         this._role = new UserRole(role);
         if ((fullName ?? '').trim().length < 3) throw new Error('validation.full-name-required');
         if (this._role.isMerchant && (businessName ?? '').trim().length < 3) throw new Error('validation.business-name-required');
+        if (this._role.isMerchant && (businessType ?? '').trim().length < 2) throw new Error('validation.business-type-required');
         this._email = new Email(email);
         this._phone = new Phone(phone);
-        this._document = this._role.isCarrier ? new Dni(documentNumber) : new Ruc(documentNumber);
+        this._dni = new Dni(dni);
+        this._ruc = this._role.isMerchant ? new Ruc(ruc) : null;
         if ((password ?? '').length < SignUpCommand.MIN_PASSWORD_LENGTH) throw new Error('validation.password-too-short');
         if (password !== confirmPassword) throw new Error('validation.password-mismatch');
         if (!acceptedTerms) throw new Error('validation.terms-required');
         this._fullName = fullName.trim();
         this._businessName = (businessName ?? '').trim();
+        this._businessType = (businessType ?? '').trim();
         this._password = password;
         Object.freeze(this);
     }
@@ -70,9 +75,24 @@ export class SignUpCommand {
         return this._phone.value;
     }
 
-    /** @returns {string} DNI or RUC number. */
-    get documentNumber() {
-        return this._document.value;
+    /** @returns {boolean} True when the user registers as a merchant. */
+    get isMerchant() {
+        return this._role.isMerchant;
+    }
+
+    /** @returns {string} Type of business. */
+    get businessType() {
+        return this._businessType;
+    }
+
+    /** @returns {string} DNI number. */
+    get dni() {
+        return this._dni.value;
+    }
+
+    /** @returns {?string} RUC number (merchants only). */
+    get ruc() {
+        return this._ruc?.value ?? null;
     }
 
     /** @returns {string} Password. */

@@ -16,7 +16,7 @@ const alertsPanel = ref();
 
 const title = computed(() => route.meta?.title ? t(route.meta.title) : '');
 const userName = computed(() => iamStore.state.currentUser?.fullName ?? '');
-const roleLabel = computed(() => iamStore.isCarrier.value ? t('roles.carrier') : t('roles.merchant'));
+const roleLabel = computed(() => iamStore.activeRole.value ? t(`roles.${iamStore.activeRole.value.toLowerCase()}`) : '');
 
 /**
  * Opens the alerts panel and marks every alert as read.

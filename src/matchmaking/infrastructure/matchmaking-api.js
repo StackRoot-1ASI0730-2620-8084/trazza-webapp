@@ -1,93 +1,45 @@
 import {BaseApi} from "../../shared/infrastructure/base-api.js";
-import {BaseEndpoint} from "../../shared/infrastructure/base-endpoint.js";
 
-const returnRoutesEndpointPath = import.meta.env.VITE_RETURN_ROUTES_ENDPOINT_PATH;
-const freightRequestsEndpointPath = import.meta.env.VITE_FREIGHT_REQUESTS_ENDPOINT_PATH;
-const matchProposalsEndpointPath = import.meta.env.VITE_MATCH_PROPOSALS_ENDPOINT_PATH;
+const returnRoutesPath = import.meta.env.VITE_RETURN_ROUTES_ENDPOINT_PATH ?? '/return-routes';
+const shipmentRequestsPath = import.meta.env.VITE_SHIPMENT_REQUESTS_ENDPOINT_PATH ?? '/shipment-requests';
+const matchProposalsPath = import.meta.env.VITE_MATCH_PROPOSALS_ENDPOINT_PATH ?? '/match-proposals';
 
 /**
- * Infrastructure gateway for the Matchmaking & Routing bounded context endpoints.
- *
+ * Gateway to the Matchmaking &amp; Routing bounded context.
  * @class MatchmakingApi
- * @extends BaseApi
  */
 export class MatchmakingApi extends BaseApi {
-    /** Creates endpoint clients for return routes, freight requests and match proposals. */
-    constructor() {
-        super();
-        this._returnRoutesEndpoint = new BaseEndpoint(this, returnRoutesEndpointPath);
-        this._freightRequestsEndpoint = new BaseEndpoint(this, freightRequestsEndpointPath);
-        this._matchProposalsEndpoint = new BaseEndpoint(this, matchProposalsEndpointPath);
-    }
+    listMyRoutes() { return this.http.get(`${returnRoutesPath}/mine`); }
 
-    /** @returns {Promise<import('axios').AxiosResponse>} Response with every return route. */
-    getReturnRoutes() {
-        return this._returnRoutesEndpoint.getAll();
-    }
+    getRoute(id) { return this.http.get(`${returnRoutesPath}/${id}`); }
 
-    /**
-     * @param {Object} resource - Return route resource.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created route.
-     */
-    createReturnRoute(resource) {
-        return this._returnRoutesEndpoint.create(resource);
-    }
+    createRoute(resource) { return this.http.post(returnRoutesPath, resource); }
 
-    /**
-     * @param {Object} resource - Return route resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated route.
-     */
-    updateReturnRoute(resource) {
-        return this._returnRoutesEndpoint.update(resource.id, resource);
-    }
+    cancelRoute(id) { return this.http.post(`${returnRoutesPath}/${id}/cancel`); }
 
-    /** @returns {Promise<import('axios').AxiosResponse>} Response with every freight request. */
-    getFreightRequests() {
-        return this._freightRequestsEndpoint.getAll();
-    }
+    suggestShipments(routeId) { return this.http.get(`${returnRoutesPath}/${routeId}/suggested-shipments`); }
 
-    /**
-     * @param {Object} resource - Freight request resource.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created request.
-     */
-    createFreightRequest(resource) {
-        return this._freightRequestsEndpoint.create(resource);
-    }
+    listMyShipments() { return this.http.get(`${shipmentRequestsPath}/mine`); }
 
-    /**
-     * @param {Object} resource - Freight request resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated request.
-     */
-    updateFreightRequest(resource) {
-        return this._freightRequestsEndpoint.update(resource.id, resource);
-    }
+    listOpenShipments() { return this.http.get(`${shipmentRequestsPath}/open`); }
 
-    /**
-     * @param {number} id - Freight request identifier.
-     * @returns {Promise<import('axios').AxiosResponse>} Delete response.
-     */
-    deleteFreightRequest(id) {
-        return this._freightRequestsEndpoint.delete(id);
-    }
+    getShipment(id) { return this.http.get(`${shipmentRequestsPath}/${id}`); }
 
-    /** @returns {Promise<import('axios').AxiosResponse>} Response with every match proposal. */
-    getMatchProposals() {
-        return this._matchProposalsEndpoint.getAll();
-    }
+    createShipment(resource) { return this.http.post(shipmentRequestsPath, resource); }
 
-    /**
-     * @param {Object} resource - Match proposal resource.
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the created proposal.
-     */
-    createMatchProposal(resource) {
-        return this._matchProposalsEndpoint.create(resource);
-    }
+    cancelShipment(id, reason) { return this.http.post(`${shipmentRequestsPath}/${id}/cancel`, null, { params: { reason } }); }
 
-    /**
-     * @param {Object} resource - Match proposal resource (must include id).
-     * @returns {Promise<import('axios').AxiosResponse>} Response with the updated proposal.
-     */
-    updateMatchProposal(resource) {
-        return this._matchProposalsEndpoint.update(resource.id, resource);
-    }
+    suggestRoutes(shipmentId) { return this.http.get(`${shipmentRequestsPath}/${shipmentId}/suggested-routes`); }
+
+    listProposals() { return this.http.get(matchProposalsPath); }
+
+    getProposal(id) { return this.http.get(`${matchProposalsPath}/${id}`); }
+
+    createProposal(resource) { return this.http.post(matchProposalsPath, resource); }
+
+    respondProposal(id, action) { return this.http.post(`${matchProposalsPath}/${id}/${action}`); }
+
+    listMessages(proposalId) { return this.http.get(`${matchProposalsPath}/${proposalId}/messages`); }
+
+    sendMessage(proposalId, content) { return this.http.post(`${matchProposalsPath}/${proposalId}/messages`, { content }); }
 }

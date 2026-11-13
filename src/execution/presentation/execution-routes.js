@@ -1,13 +1,11 @@
-const activeTrip = () => import('./views/active-trip.vue');
-const tripHistory = () => import('./views/trip-history.vue');
-const shipmentTracking = () => import('./views/shipment-tracking.vue');
-const shipmentHistory = () => import('./views/shipment-history.vue');
+const tripList = () => import('./views/trip-list.vue');
+const tripDetail = () => import('./views/trip-detail.vue');
+const iotDeviceList = () => import('./views/iot-device-list.vue');
 
 const executionRoutes = [
-    { path: 'active-trip',       name: 'execution-active-trip',       component: activeTrip,       meta: { title: 'option.active-trip', roles: ['carrier'] } },
-    { path: 'trip-history',      name: 'execution-trip-history',      component: tripHistory,      meta: { title: 'option.trip-history', roles: ['carrier'] } },
-    { path: 'shipment-tracking', name: 'execution-shipment-tracking', component: shipmentTracking, meta: { title: 'option.shipment-tracking', roles: ['merchant'] } },
-    { path: 'shipment-history',  name: 'execution-shipment-history',  component: shipmentHistory,  meta: { title: 'option.shipment-history', roles: ['merchant'] } }
+    { path: 'trips',       name: 'execution-trips',       component: tripList,      meta: { title: 'option.trips' } },
+    { path: 'trips/:id',   name: 'execution-trip-detail', component: tripDetail,    meta: { title: 'trip.detail-title' } },
+    { path: 'iot-devices', name: 'execution-iot-devices', component: iotDeviceList, meta: { title: 'option.iot-devices', roles: ['CARRIER'] } }
 ];
 
 export default executionRoutes;

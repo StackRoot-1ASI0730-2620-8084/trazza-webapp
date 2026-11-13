@@ -1,25 +1,22 @@
 import {computed, reactive} from "vue";
 import {IamApi} from "../infrastructure/iam-api.js";
-import {UserAssembler} from "../infrastructure/user.assembler.js";
-import {SESSION_TOKEN_KEY} from "../infrastructure/iam.interceptor.js";
-import {Phone} from "../domain/model/phone.value-object.js";
-import useProfileStore from "./profile.store.js";
+import {IamAssembler} from "../infrastructure/iam.assembler.js";
+import {sessionStorage} from "../infrastructure/session.storage.js";
+import {UserRole} from "../domain/model/user-role.value-object.js";
 
 const iamApi = new IamApi();
 
 /**
- * Key used to persist the signed-in user resource in the browser storage.
- * @type {string}
- */
-const SESSION_USER_KEY = 'trazza.session.user';
-
-/**
- * Reactive state of the IAM bounded context.
+ * Reactive state of the IAM bounded context. One account can hold both roles; the active role decides which
+ * menu the user sees and can be switched at any time.
  *
- * @type {{currentUser: ?import('../domain/model/user.entity.js').User, errors: Error[], processing: boolean}}
+ * @type {{currentUser: ?import('../domain/model/user.entity.js').User, activeRole: ?string, verifications: Object[],
+ *     errors: Error[], processing: boolean}}
  */
 const state = reactive({
     currentUser: null,
+    activeRole: null,
+    verifications: [],
     errors: [],
     processing: false
 });
@@ -27,43 +24,71 @@ const state = reactive({
 /** @type {import('vue').ComputedRef<boolean>} Whether a user is signed in. */
 const isSignedIn = computed(() => state.currentUser !== null);
 
-/** @type {import('vue').ComputedRef<?string>} Role of the signed-in user. */
-const currentRole = computed(() => state.currentUser?.role.value ?? null);
+/** @type {import('vue').ComputedRef<string[]>} Roles of the account. */
+const roles = computed(() => state.currentUser?.roles ?? []);
 
-/** @type {import('vue').ComputedRef<?number>} Identifier of the signed-in user. */
+/** @type {import('vue').ComputedRef<?string>} Role the user is working with (CARRIER or MERCHANT). */
+const activeRole = computed(() => state.activeRole);
+
+/** @type {import('vue').ComputedRef<?string>} Same as the active role. */
+const currentRole = activeRole;
+
+/** @type {import('vue').ComputedRef<?string>} Public id of the signed-in user. */
 const currentUserId = computed(() => state.currentUser?.id ?? null);
 
-/** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a carrier. */
-const isCarrier = computed(() => currentRole.value === 'carrier');
+/** @type {import('vue').ComputedRef<boolean>} Whether the user works as a carrier. */
+const isCarrier = computed(() => state.activeRole === UserRole.CARRIER);
 
-/** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a merchant. */
-const isMerchant = computed(() => currentRole.value === 'merchant');
+/** @type {import('vue').ComputedRef<boolean>} Whether the user works as a merchant. */
+const isMerchant = computed(() => state.activeRole === UserRole.MERCHANT);
 
 /**
- * Stores the session of a user in memory and in the browser storage.
+ * Applies an account resource to the state and keeps the active role valid. The session storage calls it on
+ * sign-in, on every refresh of the tokens and on sign-out (with null).
  *
- * @param {import('../domain/model/user.entity.js').User} user - Authenticated user.
- * @param {string} token - Bearer token (JWT) issued by the Trazza Platform API.
+ * @param {?Object} resource - Account resource, or null when the session ends.
  * @returns {void}
  */
-function startSession(user, token) {
-    state.currentUser = user;
-    localStorage.setItem(SESSION_TOKEN_KEY, token);
-    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(UserAssembler.toResourceFromEntity(user)));
+function applyUser(resource) {
+    if (!resource) {
+        state.currentUser = null;
+        state.activeRole = null;
+        return;
+    }
+    state.currentUser = IamAssembler.toUser(resource);
+    const stored = sessionStorage.activeRole;
+    state.activeRole = state.currentUser.hasRole(stored) ? stored : state.currentUser.roles[0] ?? null;
+    sessionStorage.activeRole = state.activeRole;
+}
+
+sessionStorage.onChange(applyUser);
+applyUser(sessionStorage.accessToken ? sessionStorage.user : null);
+
+/**
+ * Turns an error response of the platform API into an error whose message is an i18n key.
+ * The API returns a ProblemDetails body with a stable code, such as email-invalid.
+ *
+ * @param {Error} error - Error thrown by the HTTP client.
+ * @returns {Error} Error with a validation.* message, or the original error.
+ */
+function toApiError(error) {
+    const code = error.response?.data?.code;
+    return code ? new Error(`validation.${code}`) : error;
 }
 
 /**
- * Restores a previous session from the browser storage.
+ * Runs an action while the processing flag is on.
  *
- * @returns {void}
+ * @template T
+ * @param {function(): Promise<T>} action - Action to run.
+ * @returns {Promise<T>} Result of the action.
  */
-function restoreSession() {
-    const serializedUser = localStorage.getItem(SESSION_USER_KEY);
-    if (!serializedUser || !localStorage.getItem(SESSION_TOKEN_KEY)) return;
+async function run(action) {
+    state.processing = true;
     try {
-        state.currentUser = UserAssembler.toEntityFromResource(JSON.parse(serializedUser));
-    } catch (error) {
-        signOut();
+        return await action();
+    } finally {
+        state.processing = false;
     }
 }
 
@@ -72,84 +97,129 @@ function restoreSession() {
  *
  * @param {import('../domain/commands/sign-in.command.js').SignInCommand} signInCommand - Sign-in command.
  * @returns {Promise<import('../domain/model/user.entity.js').User>} Authenticated user.
- * @throws {Error} When the credentials are not valid.
  */
-async function signIn(signInCommand) {
-    state.processing = true;
+const signIn = signInCommand => run(async () => {
     try {
-        const response = await iamApi.signIn(signInCommand)
-            .catch(error => { throw [400, 401].includes(error.response?.status) ? new Error('validation.invalid-credentials') : error; });
-        const user = UserAssembler.toEntityFromResource(response.data);
-        startSession(user, response.data.token);
+        const response = await iamApi.signIn(signInCommand).catch(error => { throw toApiError(error); });
+        sessionStorage.save(response.data);
         state.errors = [];
-        return user;
+        return state.currentUser;
     } catch (error) {
         state.errors.push(error);
         throw error;
-    } finally {
-        state.processing = false;
     }
-}
+});
 
 /**
- * Executes the sign-up use case: registers the user, creates its profile and opens a session.
+ * Executes the sign-up use case: the platform registers the user with its profile and opens a session.
  *
  * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
  * @returns {Promise<import('../domain/model/user.entity.js').User>} Registered user.
- * @throws {Error} When the e-mail is already registered.
  */
-async function signUp(signUpCommand) {
-    state.processing = true;
+const signUp = signUpCommand => run(async () => {
     try {
-        const response = await iamApi.signUp(signUpCommand)
-            .catch(error => { throw error.response?.status === 409 ? new Error('validation.email-already-registered') : error; });
-        const user = UserAssembler.toEntityFromResource(response.data);
-        // The session starts first so the profile is created with the new bearer token.
-        startSession(user, response.data.token);
-        await useProfileStore().createProfileForUser(user, signUpCommand);
+        const response = await iamApi.signUp(signUpCommand).catch(error => { throw toApiError(error); });
+        sessionStorage.save(response.data);
         state.errors = [];
-        return user;
+        return state.currentUser;
     } catch (error) {
         state.errors.push(error);
         throw error;
-    } finally {
-        state.processing = false;
     }
+});
+
+/**
+ * Revokes the refresh token in the API (best effort) and clears the local session.
+ *
+ * @returns {Promise<void>}
+ */
+async function signOut() {
+    const refreshToken = sessionStorage.refreshToken;
+    state.errors = [];
+    try {
+        if (refreshToken) await iamApi.signOut(refreshToken);
+    } catch (error) {
+        // The local session is cleared anyway.
+    }
+    sessionStorage.clear();
+}
+
+/**
+ * Reloads the account from the API (roles, profiles, KYC status).
+ *
+ * @returns {Promise<import('../domain/model/user.entity.js').User>} Signed-in user.
+ */
+async function refreshAccount() {
+    const response = await iamApi.getMe();
+    sessionStorage.saveUser(response.data);
+    return state.currentUser;
+}
+
+/**
+ * @param {string} role - CARRIER or MERCHANT, must be one of the user's roles.
+ * @returns {void}
+ */
+function switchRole(role) {
+    if (!state.currentUser?.hasRole(role)) return;
+    state.activeRole = role;
+    sessionStorage.activeRole = role;
 }
 
 /**
  * Updates the contact data of the signed-in user.
  *
- * @param {Object} params - New contact data.
- * @param {string} params.fullName - Full name.
- * @param {string} params.phone - Mobile phone.
+ * @param {{fullName: string, phone: string}} identity - New contact data.
  * @returns {Promise<void>}
  */
-async function updateCurrentUser({ fullName, phone }) {
-    const user = state.currentUser;
-    user.updateContact({ fullName, phone: new Phone(phone) });
-    const resource = UserAssembler.toResourceFromEntity(user);
-    await iamApi.updateUser(resource);
-    localStorage.setItem(SESSION_USER_KEY, JSON.stringify(resource));
+const updateIdentity = ({ fullName, phone }) => run(async () => {
+    const response = await iamApi.updateIdentity({ fullName, phone });
+    sessionStorage.saveUser(response.data);
+});
+
+/**
+ * Adds the missing role to the account and switches to it. The merchant role needs the business data.
+ *
+ * @param {string} role - CARRIER or MERCHANT.
+ * @param {?{businessName: string, ruc: string, businessType: string}} merchant - Business data.
+ * @returns {Promise<void>}
+ */
+const addRole = (role, merchant = null) => run(async () => {
+    const response = await iamApi.addRole({ role, merchant });
+    sessionStorage.saveUser(response.data);
+    switchRole(role);
+});
+
+/**
+ * @param {{businessName: string, businessType: string}} business - New business data.
+ * @returns {Promise<void>}
+ */
+const updateMerchantProfile = ({ businessName, businessType }) => run(async () => {
+    const response = await iamApi.updateMerchantProfile({ businessName, businessType });
+    sessionStorage.saveUser(response.data);
+});
+
+/** @returns {Promise<void>} Loads the identity checks of the user. */
+async function fetchVerifications() {
+    state.verifications = (await iamApi.listIdentityVerifications()).data;
 }
 
 /**
- * Clears the active session and local authentication artifacts.
+ * Sends the identity check to the simulated RENIEC provider and reloads the account.
  *
- * @returns {void}
+ * @param {?string} [documentFrontS3Key=null] - Photo of the front of the DNI.
+ * @param {?string} [documentBackS3Key=null] - Photo of the back of the DNI.
+ * @returns {Promise<void>}
  */
-function signOut() {
-    state.currentUser = null;
-    state.errors = [];
-    localStorage.removeItem(SESSION_TOKEN_KEY);
-    localStorage.removeItem(SESSION_USER_KEY);
-}
-
-restoreSession();
+const submitVerification = (documentFrontS3Key = null, documentBackS3Key = null) => run(async () => {
+    await iamApi.submitIdentityVerification({ documentFrontS3Key, documentBackS3Key });
+    await Promise.all([fetchVerifications(), refreshAccount()]);
+});
 
 const iamStore = {
     state,
     isSignedIn,
+    roles,
+    activeRole,
     currentRole,
     currentUserId,
     isCarrier,
@@ -157,7 +227,13 @@ const iamStore = {
     signIn,
     signUp,
     signOut,
-    updateCurrentUser
+    refreshAccount,
+    switchRole,
+    updateIdentity,
+    addRole,
+    updateMerchantProfile,
+    fetchVerifications,
+    submitVerification
 };
 
 /**
