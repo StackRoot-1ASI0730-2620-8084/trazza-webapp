@@ -18,7 +18,7 @@ export class SignUpCommand {
 
     /**
      * @param {Object} params - Command attributes.
-     * @param {string} params.role - "carrier" or "merchant".
+     * @param {string} params.role - CARRIER or MERCHANT.
      * @param {string} params.fullName - Full name of the person.
      * @param {string} [params.businessName=''] - Business name (merchants only).
      * @param {string} [params.businessType=''] - Type of business (merchants only).

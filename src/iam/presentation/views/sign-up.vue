@@ -4,6 +4,7 @@ import {useI18n} from "vue-i18n";
 import {useRoute, useRouter} from "vue-router";
 import useIamStore from "../../application/iam.store.js";
 import {SignUpCommand} from "../../domain/commands/sign-up.command.js";
+import {UserRole} from "../../domain/model/user-role.value-object.js";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 
 const { t } = useI18n();
@@ -14,7 +15,7 @@ const { describeError } = useErrorHandler();
 const errorMessage = ref('');
 
 const form = reactive({
-  role: route.query.role === 'merchant' ? 'merchant' : 'carrier',
+  role: route.query.role?.toUpperCase() === UserRole.MERCHANT ? UserRole.MERCHANT : UserRole.CARRIER,
   fullName: '',
   businessName: '',
   businessType: '',
@@ -27,11 +28,11 @@ const form = reactive({
   acceptedTerms: false
 });
 
-const isMerchant = computed(() => form.role === 'merchant');
+const isMerchant = computed(() => form.role === UserRole.MERCHANT);
 
 const roles = [
-  { value: 'carrier', title: 'sign-up.carrier-title', description: 'sign-up.carrier-description', icon: 'pi pi-truck' },
-  { value: 'merchant', title: 'sign-up.merchant-title', description: 'sign-up.merchant-description', icon: 'pi pi-shop' }
+  { value: UserRole.CARRIER, title: 'sign-up.carrier-title', description: 'sign-up.carrier-description', icon: 'pi pi-truck' },
+  { value: UserRole.MERCHANT, title: 'sign-up.merchant-title', description: 'sign-up.merchant-description', icon: 'pi pi-shop' }
 ];
 
 /**
@@ -55,8 +56,8 @@ const performSignUp = async () => {
     <form class="flex flex-column gap-3" @submit.prevent="performSignUp">
       <div class="grid m-0">
         <div v-for="role in roles" :key="role.value" class="col-12 md:col-6 p-1">
-          <label :for="`role-${role.value}`" class="role-option flex gap-3 p-3 cursor-pointer" :class="{ 'role-selected': form.role === role.value }">
-            <pv-radio-button v-model="form.role" :input-id="`role-${role.value}`" name="role" :value="role.value"/>
+          <label :for="`role-${role.value.toLowerCase()}`" class="role-option flex gap-3 p-3 cursor-pointer" :class="{ 'role-selected': form.role === role.value }">
+            <pv-radio-button v-model="form.role" :input-id="`role-${role.value.toLowerCase()}`" name="role" :value="role.value"/>
             <div>
               <div class="font-semibold"><i :class="role.icon" class="mr-2"></i>{{ t(role.title) }}</div>
               <div class="text-sm trazza-muted">{{ t(role.description) }}</div>

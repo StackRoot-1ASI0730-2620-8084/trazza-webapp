@@ -17,7 +17,7 @@ export class UserAssembler {
      * @returns {User} User entity.
      */
     static toEntityFromResource(resource) {
-        const role = resource.role ?? (resource.roles?.includes('CARRIER') ? 'carrier' : resource.roles?.[0]?.toLowerCase());
+        const role = resource.role ?? (resource.roles?.includes(UserRole.CARRIER) ? UserRole.CARRIER : resource.roles?.[0]);
         return new User({
             id: resource.id,
             fullName: resource.identity?.fullName ?? resource.fullName,

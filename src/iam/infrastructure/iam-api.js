@@ -48,7 +48,7 @@ export class IamApi extends BaseApi {
             fullName: signUpCommand.fullName,
             dni: signUpCommand.dni,
             phone: signUpCommand.phone,
-            roles: [signUpCommand.role.toUpperCase()],
+            roles: [signUpCommand.role],
             merchant: signUpCommand.isMerchant
                 ? { businessName: signUpCommand.businessName, ruc: signUpCommand.ruc, businessType: signUpCommand.businessType }
                 : null

@@ -3,6 +3,7 @@ import {IamApi} from "../infrastructure/iam-api.js";
 import {UserAssembler} from "../infrastructure/user.assembler.js";
 import {sessionStorage} from "../infrastructure/session.storage.js";
 import {Phone} from "../domain/model/phone.value-object.js";
+import {UserRole} from "../domain/model/user-role.value-object.js";
 
 const iamApi = new IamApi();
 
@@ -27,10 +28,10 @@ const currentRole = computed(() => state.currentUser?.role.value ?? null);
 const currentUserId = computed(() => state.currentUser?.id ?? null);
 
 /** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a carrier. */
-const isCarrier = computed(() => currentRole.value === 'carrier');
+const isCarrier = computed(() => currentRole.value === UserRole.CARRIER);
 
 /** @type {import('vue').ComputedRef<boolean>} Whether the signed-in user is a merchant. */
-const isMerchant = computed(() => currentRole.value === 'merchant');
+const isMerchant = computed(() => currentRole.value === UserRole.MERCHANT);
 
 /**
  * Applies the account stored in the session to the state. The session storage calls it on sign-in, on every

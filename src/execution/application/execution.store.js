@@ -186,7 +186,7 @@ async function reportIncident(shipment, { type, description }) {
         type: new IncidentType(type),
         description,
         reporterId: iamStore.currentUserId.value,
-        reporterRole: iamStore.currentRole.value,
+        reporterRole: iamStore.currentRole.value?.toLowerCase(),
         reportedAt: new Date().toISOString()
     }));
     await persist(shipment);

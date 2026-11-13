@@ -5,21 +5,22 @@
  */
 export class UserRole {
     /** @type {string} Carrier role: owns vehicles and publishes return routes. */
-    static CARRIER = 'carrier';
+    static CARRIER = 'CARRIER';
 
     /** @type {string} Merchant role: publishes freight requests. */
-    static MERCHANT = 'merchant';
+    static MERCHANT = 'MERCHANT';
 
     /** @type {ReadonlyArray<string>} Supported roles. */
     static VALUES = Object.freeze([UserRole.CARRIER, UserRole.MERCHANT]);
 
     /**
-     * @param {string} value - Role value.
+     * @param {string} value - Role value, as the API names it (CARRIER or MERCHANT).
      * @throws {Error} When the role is not supported.
      */
     constructor(value) {
-        if (!UserRole.VALUES.includes(value)) throw new Error('validation.role-invalid');
-        this._value = value;
+        const role = (value ?? '').toUpperCase();
+        if (!UserRole.VALUES.includes(role)) throw new Error('validation.role-invalid');
+        this._value = role;
         Object.freeze(this);
     }
 
