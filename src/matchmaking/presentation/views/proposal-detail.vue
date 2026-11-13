@@ -6,6 +6,7 @@ import {useConfirm} from "primevue";
 import useMatchmakingStore from "../../application/matchmaking.store.js";
 import useIamStore from "../../../iam/application/iam.store.js";
 import ChatPanel from "../components/chat-panel.vue";
+import RouteMap from "../../../shared/presentation/components/route-map.vue";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 import {formatDateTime, formatMoney, formatNumber, statusKey, statusSeverity} from "../../../shared/presentation/formatters.js";
 
@@ -19,6 +20,12 @@ const { showError, showSuccess } = useErrorHandler();
 const proposal = ref(null);
 const busy = ref(false);
 
+const stops = computed(() => proposal.value ? [
+  { label: 'A', ...proposal.value.route.origin, color: '#64748b' },
+  { label: '1', ...proposal.value.shipment.pickup, color: '#0037b0' },
+  { label: '2', ...proposal.value.shipment.delivery, color: '#16a34a' },
+  { label: 'B', ...proposal.value.route.destination, color: '#64748b' }
+] : []);
 const counterpart = computed(() => iam.isCarrier.value ? proposal.value?.merchant : proposal.value?.carrier);
 
 onMounted(async () => {
@@ -85,6 +92,7 @@ const ask = (action, severity) => confirm.require({
                        @click="router.push({ name: 'execution-trip-detail', params: { id: proposal.tripId } })"/>
           </div>
         </div>
+        <div class="trazza-panel"><route-map :stops="stops" height="20rem"/></div>
       </div>
       <div class="col-12 lg:col-5">
         <chat-panel :proposal-id="proposal.id" :open="proposal.chatOpen" :counterpart="iam.isCarrier.value ? t('roles.merchant') : t('roles.carrier')"/>

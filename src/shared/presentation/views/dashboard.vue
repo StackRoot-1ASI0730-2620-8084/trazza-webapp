@@ -25,8 +25,8 @@ const greetingKey = computed(() => {
 });
 const reputation = computed(() => ({ average: reputationStore.averageScore.value, count: reputationStore.state.received.length }));
 const month = new Date().toLocaleDateString('en-CA').slice(0, 7);
-const shipmentsThisMonth = computed(() => executionStore.myShipments.value.filter(item => (item.createdAt ?? '').slice(0, 7) === month).length);
-const activeShipment = computed(() => executionStore.myActiveShipments.value[0] ?? null);
+const tripsThisMonth = computed(() => executionStore.state.trips.filter(trip => String(trip.createdAt ?? '').slice(0, 7) === month).length);
+const activeTrip = computed(() => executionStore.activeTrips.value[0] ?? null);
 const openRoutes = computed(() => matchmakingStore.openRoutes.value);
 const nextRoute = computed(() => [...openRoutes.value].sort((a, b) => String(a.departureAt).localeCompare(String(b.departureAt)))[0] ?? null);
 const openRequests = computed(() => matchmakingStore.state.myShipments.filter(shipment => shipment.isOpen));
@@ -35,12 +35,12 @@ const topShipments = computed(() => matchmakingStore.state.openShipments.slice(0
 const carrierKpis = computed(() => [
   { label: 'dashboard.active-routes', value: openRoutes.value.length, hint: nextRoute.value ? formatDateTime(nextRoute.value.departureAt, locale.value) : '—' },
   { label: 'dashboard.pending-offers', value: matchmakingStore.pendingProposals.value.length, hint: t('dashboard.waiting-for-you') },
-  { label: 'dashboard.trips-month', value: shipmentsThisMonth.value, hint: t('dashboard.this-month') },
+  { label: 'dashboard.trips-month', value: tripsThisMonth.value, hint: t('dashboard.this-month') },
   { label: 'dashboard.your-rating', value: reputation.value.count ? `${formatNumber(reputation.value.average)} ★` : '—', hint: t('reputation.based-on', { count: reputation.value.count }) }
 ]);
 
 const merchantKpis = computed(() => [
-  { label: 'dashboard.in-transit', value: executionStore.myActiveShipments.value.length, hint: activeShipment.value?.etaMinutes ? t('dashboard.eta', { minutes: activeShipment.value.etaMinutes }) : '—' },
+  { label: 'dashboard.in-transit', value: executionStore.activeTrips.value.length, hint: activeTrip.value ? formatDateTime(activeTrip.value.departureAt, locale.value) : '—' },
   { label: 'dashboard.open-requests', value: openRequests.value.length, hint: t('dashboard.waiting-carriers') },
   { label: 'dashboard.offers-to-review', value: matchmakingStore.pendingProposals.value.length, hint: t('dashboard.waiting-for-you') },
   { label: 'dashboard.your-rating', value: reputation.value.count ? `${formatNumber(reputation.value.average)} ★` : '—', hint: t('reputation.based-on', { count: reputation.value.count }) }
@@ -71,14 +71,13 @@ const kpis = computed(() => isCarrier.value ? carrierKpis.value : merchantKpis.v
     <div class="grid mt-2">
       <div class="col-12 lg:col-6">
         <div class="trazza-panel h-full">
-          <template v-if="activeShipment">
+          <template v-if="activeTrip">
             <div class="trazza-overline mb-2">{{ isCarrier ? t('dashboard.active-trip') : t('dashboard.shipment-in-transit') }}</div>
-            <div class="trazza-route text-lg">{{ activeShipment.label }}</div>
-            <div class="text-sm mb-2">{{ isCarrier ? activeShipment.merchantName : `${t('roles.carrier')}: ${activeShipment.carrierName}` }}</div>
-            <pv-tag :value="t(`statuses.${activeShipment.status.value}`)" :severity="statusSeverity(activeShipment.status.value)"/>
+            <div class="trazza-route text-lg">{{ activeTrip.label }}</div>
+            <div class="text-sm mb-2">{{ isCarrier ? activeTrip.merchant?.name : `${t('roles.carrier')}: ${activeTrip.carrier?.name ?? ''}` }}</div>
+            <pv-tag :value="t(`statuses.${statusKey(activeTrip.status)}`)" :severity="statusSeverity(activeTrip.status)"/>
             <div class="mt-3">
-              <pv-button v-if="isCarrier" :label="t('dashboard.view-trip')" size="small" @click="router.push({ name: 'execution-active-trip' })"/>
-              <pv-button v-else :label="t('dashboard.track-shipment')" size="small" @click="router.push({ name: 'execution-shipment-tracking', query: { shipmentId: activeShipment.id } })"/>
+              <pv-button :label="isCarrier ? t('dashboard.view-trip') : t('dashboard.track-shipment')" size="small" @click="router.push({ name: 'execution-trip-detail', params: { id: activeTrip.id } })"/>
             </div>
           </template>
           <template v-else-if="isCarrier && nextRoute">

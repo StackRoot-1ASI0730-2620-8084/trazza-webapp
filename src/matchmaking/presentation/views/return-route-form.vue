@@ -5,7 +5,7 @@ import {useRouter} from "vue-router";
 import useMatchmakingStore from "../../application/matchmaking.store.js";
 import useFleetStore from "../../../iam/application/fleet.store.js";
 import {CreateReturnRouteCommand} from "../../domain/commands/matchmaking.commands.js";
-import PlaceField from "../../../shared/presentation/components/place-field.vue";
+import MapPicker from "../../../shared/presentation/components/map-picker.vue";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 
 const { t } = useI18n();
@@ -65,10 +65,10 @@ const submit = async () => {
         <small class="trazza-muted">{{ t('return-route.max-shipments-hint') }}</small>
       </div>
       <div class="col-12 lg:col-6">
-        <place-field v-model="form.origin" :label="t('fields.origin')" input-id="route-origin" :saved-addresses="fleet.state.savedAddresses"/>
+        <map-picker v-model="form.origin" :label="t('fields.origin')" input-id="route-origin" :saved-addresses="fleet.state.savedAddresses"/>
       </div>
       <div class="col-12 lg:col-6">
-        <place-field v-model="form.destination" :label="t('fields.destination')" input-id="route-destination" :saved-addresses="fleet.state.savedAddresses"/>
+        <map-picker v-model="form.destination" :label="t('fields.destination')" input-id="route-destination" :saved-addresses="fleet.state.savedAddresses"/>
       </div>
       <div class="col-12 flex justify-content-end gap-2">
         <pv-button :label="t('actions.cancel')" severity="secondary" outlined @click="router.back()"/>

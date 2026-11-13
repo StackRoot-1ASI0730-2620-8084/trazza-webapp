@@ -106,7 +106,13 @@ const STATUS_SEVERITIES = Object.freeze({
     full: 'warn',
     in_progress: 'info',
     completed: 'success',
-    expired: 'secondary'
+    expired: 'secondary',
+    scheduled: 'secondary',
+    confirmed: 'success',
+    in_review: 'warn',
+    resolved: 'success',
+    available: 'success',
+    loaned: 'info'
 });
 
 /**

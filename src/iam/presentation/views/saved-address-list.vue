@@ -2,6 +2,7 @@
 import {onMounted, reactive, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import useFleetStore from "../../application/fleet.store.js";
+import MapPicker from "../../../shared/presentation/components/map-picker.vue";
 import {GeoLocation} from "../../../shared/domain/model/geo-location.value-object.js";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 
@@ -9,19 +10,19 @@ const { t } = useI18n();
 const store = useFleetStore();
 const { showError, showSuccess } = useErrorHandler();
 const dialog = ref(false);
-const form = reactive({ label: '', district: '', address: '', latitude: null, longitude: null });
+const form = reactive({ label: '', district: '', place: { address: '', latitude: null, longitude: null } });
 
 onMounted(() => store.fetchSavedAddresses().catch(showError));
 
 const open = () => {
-  Object.assign(form, { label: '', district: '', address: '', latitude: null, longitude: null });
+  Object.assign(form, { label: '', district: '', place: { address: '', latitude: null, longitude: null } });
   dialog.value = true;
 };
 
 const save = async () => {
   try {
-    const location = new GeoLocation({ latitude: form.latitude, longitude: form.longitude });
-    await store.createSavedAddress({ label: form.label, address: form.address, district: form.district,
+    const location = new GeoLocation(form.place);
+    await store.createSavedAddress({ label: form.label, address: form.place.address, district: form.district,
       latitude: location.latitude, longitude: location.longitude });
     dialog.value = false;
     showSuccess('saved-address.saved');
@@ -70,20 +71,7 @@ const remove = (address) => store.deleteSavedAddress(address).then(() => showSuc
             <pv-input-text id="address-district" v-model="form.district"/>
           </div>
         </div>
-        <div class="flex flex-column gap-1">
-          <label for="address-address" class="trazza-label">{{ t('fields.address') }}</label>
-          <pv-input-text id="address-address" v-model="form.address"/>
-        </div>
-        <div class="grid">
-          <div class="col-12 md:col-6 flex flex-column gap-1">
-            <label for="address-latitude" class="trazza-label">{{ t('fields.latitude') }}</label>
-            <pv-input-number input-id="address-latitude" v-model="form.latitude" :min-fraction-digits="4" :max-fraction-digits="6" :min="-90" :max="90"/>
-          </div>
-          <div class="col-12 md:col-6 flex flex-column gap-1">
-            <label for="address-longitude" class="trazza-label">{{ t('fields.longitude') }}</label>
-            <pv-input-number input-id="address-longitude" v-model="form.longitude" :min-fraction-digits="4" :max-fraction-digits="6" :min="-180" :max="180"/>
-          </div>
-        </div>
+        <map-picker v-model="form.place" :label="t('fields.address')" input-id="saved-address-place"/>
         <div class="flex justify-content-end gap-2">
           <pv-button :label="t('actions.cancel')" severity="secondary" outlined @click="dialog = false"/>
           <pv-button type="submit" :label="t('actions.save')"/>
