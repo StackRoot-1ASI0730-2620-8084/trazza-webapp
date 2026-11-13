@@ -5,7 +5,7 @@ import {useRouter} from "vue-router";
 import useMatchmakingStore from "../../application/matchmaking.store.js";
 import useFleetStore from "../../../iam/application/fleet.store.js";
 import {CreateShipmentRequestCommand} from "../../domain/commands/matchmaking.commands.js";
-import PlaceField from "../../../shared/presentation/components/place-field.vue";
+import MapPicker from "../../../shared/presentation/components/map-picker.vue";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 
 const { t } = useI18n();
@@ -61,10 +61,10 @@ const submit = async () => {
         <pv-date-picker input-id="shipment-until" v-model="form.pickupUntil" show-time hour-format="24" :min-date="form.pickupFrom ?? new Date()" fluid/>
       </div>
       <div class="col-12 lg:col-6">
-        <place-field v-model="form.pickup" :label="t('fields.pickup')" input-id="shipment-pickup" :saved-addresses="fleet.state.savedAddresses"/>
+        <map-picker v-model="form.pickup" :label="t('fields.pickup')" input-id="shipment-pickup" :saved-addresses="fleet.state.savedAddresses"/>
       </div>
       <div class="col-12 lg:col-6">
-        <place-field v-model="form.delivery" :label="t('fields.delivery')" input-id="shipment-delivery" :saved-addresses="fleet.state.savedAddresses"/>
+        <map-picker v-model="form.delivery" :label="t('fields.delivery')" input-id="shipment-delivery" :saved-addresses="fleet.state.savedAddresses"/>
       </div>
       <div class="col-12 flex justify-content-end gap-2">
         <pv-button :label="t('actions.cancel')" severity="secondary" outlined @click="router.back()"/>

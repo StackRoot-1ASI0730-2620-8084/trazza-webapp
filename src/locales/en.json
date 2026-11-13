@@ -919,5 +919,12 @@
     "view-routes": "Compatible routes",
     "cancelled": "Shipment cancelled.",
     "published": "Shipment published."
+  },
+  "map": {
+    "address-placeholder": "Street, number, district",
+    "click-hint": "Click on the map to set the exact point.",
+    "my-location": "Use my location",
+    "saved-addresses": "Saved addresses",
+    "selected-point": "Point: {latitude}, {longitude}"
   }
 }

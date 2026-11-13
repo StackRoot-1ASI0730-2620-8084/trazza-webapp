@@ -919,5 +919,12 @@
     "view-routes": "Rutas compatibles",
     "cancelled": "Envío cancelado.",
     "published": "Envío publicado."
+  },
+  "map": {
+    "address-placeholder": "Calle, número, distrito",
+    "click-hint": "Haz clic en el mapa para marcar el punto exacto.",
+    "my-location": "Usar mi ubicación",
+    "saved-addresses": "Direcciones guardadas",
+    "selected-point": "Punto: {latitude}, {longitude}"
   }
 }

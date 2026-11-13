@@ -1,9 +1,10 @@
 <script setup>
-import {onMounted, ref} from "vue";
+import {computed, onMounted, ref} from "vue";
 import {useI18n} from "vue-i18n";
 import {useRoute} from "vue-router";
 import useMatchmakingStore from "../../application/matchmaking.store.js";
 import OfferDialog from "../components/offer-dialog.vue";
+import RouteMap from "../../../shared/presentation/components/route-map.vue";
 import {useErrorHandler} from "../../../shared/presentation/composables/use-error-handler.js";
 import {formatDateTime, formatNumber, statusKey, statusSeverity} from "../../../shared/presentation/formatters.js";
 
@@ -16,6 +17,11 @@ const suggestions = ref([]);
 const loading = ref(true);
 const offerVisible = ref(false);
 const selected = ref(null);
+
+const stops = computed(() => route.value ? [
+  { label: t('fields.origin'), ...route.value.origin, color: '#0037b0' },
+  { label: t('fields.destination'), ...route.value.destination, color: '#001f66' }
+] : []);
 
 const load = async () => {
   loading.value = true;
@@ -54,6 +60,7 @@ onMounted(load);
           <div class="text-sm trazza-muted">{{ route.vehicle.plate }} · {{ route.driverName ?? t('return-route.no-driver') }}</div>
           <div class="text-sm">{{ t('columns.slots') }}: {{ route.acceptedShipments }} / {{ route.maxShipments }} ·
             {{ t('columns.free-capacity') }}: {{ formatNumber(route.availableWeightKg) }} kg, {{ formatNumber(route.availableVolumeM3) }} m³</div>
+          <route-map :stops="stops" height="18rem"/>
         </div>
       </div>
       <div class="col-12 lg:col-7">
