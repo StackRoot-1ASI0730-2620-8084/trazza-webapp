@@ -10,16 +10,20 @@ import {UserRole} from "../domain/model/user-role.value-object.js";
  */
 export class UserAssembler {
     /**
+     * Accepts the account resource of the platform API ({id, email, roles, identity}) and the flat
+     * resource stored in the browser session ({id, fullName, email, phone, role}).
+     *
      * @param {Object} resource - User resource payload.
      * @returns {User} User entity.
      */
     static toEntityFromResource(resource) {
+        const role = resource.role ?? (resource.roles?.includes('CARRIER') ? 'carrier' : resource.roles?.[0]?.toLowerCase());
         return new User({
             id: resource.id,
-            fullName: resource.fullName,
+            fullName: resource.identity?.fullName ?? resource.fullName,
             email: new Email(resource.email),
-            phone: new Phone(resource.phone),
-            role: new UserRole(resource.role),
+            phone: new Phone(resource.identity?.phone ?? resource.phone),
+            role: new UserRole(role),
             createdAt: resource.createdAt ?? null
         });
     }

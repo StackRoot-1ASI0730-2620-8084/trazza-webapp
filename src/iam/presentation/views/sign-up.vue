@@ -17,9 +17,11 @@ const form = reactive({
   role: route.query.role === 'merchant' ? 'merchant' : 'carrier',
   fullName: '',
   businessName: '',
+  businessType: '',
   email: '',
   phone: '',
-  documentNumber: '',
+  dni: '',
+  ruc: '',
   password: '',
   confirmPassword: '',
   acceptedTerms: false
@@ -63,13 +65,14 @@ const performSignUp = async () => {
         </div>
       </div>
       <div class="grid">
-        <div class="col-12" :class="{ 'md:col-6': isMerchant }">
+        <div class="col-12 md:col-6">
           <label for="fullName" class="trazza-label">{{ t('fields.full-name') }} *</label>
           <pv-input-text id="fullName" v-model="form.fullName" class="w-full"/>
         </div>
-        <div v-if="isMerchant" class="col-12 md:col-6">
-          <label for="businessName" class="trazza-label">{{ t('fields.business-name') }} *</label>
-          <pv-input-text id="businessName" v-model="form.businessName" class="w-full"/>
+        <div class="col-12 md:col-6">
+          <label for="dni" class="trazza-label">{{ t('fields.dni') }} *</label>
+          <pv-input-text id="dni" v-model="form.dni" :placeholder="t('sign-up.dni-placeholder')" class="w-full"/>
+          <small class="trazza-muted">{{ t('sign-up.dni-hint') }}</small>
         </div>
         <div class="col-12 md:col-6">
           <label for="email" class="trazza-label">{{ t('fields.email') }} *</label>
@@ -79,11 +82,21 @@ const performSignUp = async () => {
           <label for="phone" class="trazza-label">{{ t('fields.phone') }} *</label>
           <pv-input-text id="phone" v-model="form.phone" placeholder="+51 9__ ___ ___" class="w-full"/>
         </div>
-        <div class="col-12">
-          <label for="document" class="trazza-label">{{ isMerchant ? t('fields.ruc') : t('fields.dni') }} *</label>
-          <pv-input-text id="document" v-model="form.documentNumber" :placeholder="isMerchant ? t('sign-up.ruc-placeholder') : t('sign-up.dni-placeholder')" class="w-full"/>
-          <small class="trazza-muted">{{ isMerchant ? t('sign-up.ruc-hint') : t('sign-up.dni-hint') }}</small>
-        </div>
+        <template v-if="isMerchant">
+          <div class="col-12 md:col-6">
+            <label for="businessName" class="trazza-label">{{ t('fields.business-name') }} *</label>
+            <pv-input-text id="businessName" v-model="form.businessName" class="w-full"/>
+          </div>
+          <div class="col-12 md:col-6">
+            <label for="businessType" class="trazza-label">{{ t('fields.business-type') }} *</label>
+            <pv-input-text id="businessType" v-model="form.businessType" :placeholder="t('sign-up.business-type-placeholder')" class="w-full"/>
+          </div>
+          <div class="col-12">
+            <label for="ruc" class="trazza-label">{{ t('fields.ruc') }} *</label>
+            <pv-input-text id="ruc" v-model="form.ruc" :placeholder="t('sign-up.ruc-placeholder')" class="w-full"/>
+            <small class="trazza-muted">{{ t('sign-up.ruc-hint') }}</small>
+          </div>
+        </template>
         <div class="col-12 md:col-6">
           <label for="password" class="trazza-label">{{ t('fields.password') }} *</label>
           <pv-password input-id="password" v-model="form.password" toggle-mask fluid :prompt-label="t('sign-up.password-prompt')" :weak-label="t('sign-up.password-weak')" :medium-label="t('sign-up.password-medium')" :strong-label="t('sign-up.password-strong')"/>

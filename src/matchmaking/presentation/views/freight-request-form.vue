@@ -103,7 +103,7 @@ const save = async (publish) => {
     </div>
     <pv-message v-if="limitReached" severity="warn" class="mb-3">
       {{ t('billing.limit-reached') }}
-      <router-link :to="{ name: 'billing-plan' }" class="font-semibold underline ml-1">{{ t('billing.upgrade') }}</router-link>
+      <router-link :to="{ name: 'billing-settlements' }" class="font-semibold underline ml-1">{{ t('billing.upgrade') }}</router-link>
     </pv-message>
     <div class="grid">
       <form class="col-12 lg:col-8" @submit.prevent="save(true)">

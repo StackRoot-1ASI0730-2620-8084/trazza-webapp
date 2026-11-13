@@ -1,9 +1,8 @@
 import {computed, reactive} from "vue";
 import {IamApi} from "../infrastructure/iam-api.js";
 import {UserAssembler} from "../infrastructure/user.assembler.js";
-import {SESSION_TOKEN_KEY} from "../infrastructure/iam.interceptor.js";
+import {SESSION_REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "../infrastructure/iam.interceptor.js";
 import {Phone} from "../domain/model/phone.value-object.js";
-import useProfileStore from "./profile.store.js";
 
 const iamApi = new IamApi();
 
@@ -42,14 +41,31 @@ const isMerchant = computed(() => currentRole.value === 'merchant');
 /**
  * Stores the session of a user in memory and in the browser storage.
  *
- * @param {import('../domain/model/user.entity.js').User} user - Authenticated user.
- * @param {string} token - Bearer token (JWT) issued by the Trazza Platform API.
- * @returns {void}
+ * @param {Object} session - Session resource issued by the Trazza Platform API.
+ * @param {string} session.accessToken - Bearer token (JWT).
+ * @param {string} session.refreshToken - Token used to renew the session.
+ * @param {Object} session.user - Account of the authenticated user.
+ * @returns {import('../domain/model/user.entity.js').User} Authenticated user.
  */
-function startSession(user, token) {
+function startSession(session) {
+    const user = UserAssembler.toEntityFromResource(session.user);
     state.currentUser = user;
-    localStorage.setItem(SESSION_TOKEN_KEY, token);
+    localStorage.setItem(SESSION_TOKEN_KEY, session.accessToken);
+    localStorage.setItem(SESSION_REFRESH_TOKEN_KEY, session.refreshToken);
     localStorage.setItem(SESSION_USER_KEY, JSON.stringify(UserAssembler.toResourceFromEntity(user)));
+    return user;
+}
+
+/**
+ * Turns an error response of the platform API into an error whose message is an i18n key.
+ * The API returns a ProblemDetails body with a stable code, such as email-invalid.
+ *
+ * @param {Error} error - Error thrown by the HTTP client.
+ * @returns {Error} Error with a validation.* message, or the original error.
+ */
+function toApiError(error) {
+    const code = error.response?.data?.code;
+    return code ? new Error(`validation.${code}`) : error;
 }
 
 /**
@@ -77,10 +93,8 @@ function restoreSession() {
 async function signIn(signInCommand) {
     state.processing = true;
     try {
-        const response = await iamApi.signIn(signInCommand)
-            .catch(error => { throw [400, 401].includes(error.response?.status) ? new Error('validation.invalid-credentials') : error; });
-        const user = UserAssembler.toEntityFromResource(response.data);
-        startSession(user, response.data.token);
+        const response = await iamApi.signIn(signInCommand).catch(error => { throw toApiError(error); });
+        const user = startSession(response.data);
         state.errors = [];
         return user;
     } catch (error) {
@@ -92,21 +106,17 @@ async function signIn(signInCommand) {
 }
 
 /**
- * Executes the sign-up use case: registers the user, creates its profile and opens a session.
+ * Executes the sign-up use case: the platform registers the user with its profile and opens a session.
  *
  * @param {import('../domain/commands/sign-up.command.js').SignUpCommand} signUpCommand - Sign-up command.
  * @returns {Promise<import('../domain/model/user.entity.js').User>} Registered user.
- * @throws {Error} When the e-mail is already registered.
+ * @throws {Error} When the API rejects the registration (e.g. the e-mail is already registered).
  */
 async function signUp(signUpCommand) {
     state.processing = true;
     try {
-        const response = await iamApi.signUp(signUpCommand)
-            .catch(error => { throw error.response?.status === 409 ? new Error('validation.email-already-registered') : error; });
-        const user = UserAssembler.toEntityFromResource(response.data);
-        // The session starts first so the profile is created with the new bearer token.
-        startSession(user, response.data.token);
-        await useProfileStore().createProfileForUser(user, signUpCommand);
+        const response = await iamApi.signUp(signUpCommand).catch(error => { throw toApiError(error); });
+        const user = startSession(response.data);
         state.errors = [];
         return user;
     } catch (error) {
@@ -142,6 +152,7 @@ function signOut() {
     state.currentUser = null;
     state.errors = [];
     localStorage.removeItem(SESSION_TOKEN_KEY);
+    localStorage.removeItem(SESSION_REFRESH_TOKEN_KEY);
     localStorage.removeItem(SESSION_USER_KEY);
 }
 

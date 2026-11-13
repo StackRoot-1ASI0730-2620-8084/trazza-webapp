@@ -18,7 +18,7 @@ const carrierItems = [
   { label: 'option.trip-history',     icon: 'pi pi-history',       to: { name: 'execution-trip-history' } },
   { label: 'option.vehicles',         icon: 'pi pi-car',           to: { name: 'iam-vehicles' } },
   { label: 'option.ratings',          icon: 'pi pi-star',          to: { name: 'reputation-ratings' } },
-  { label: 'option.plan-billing',     icon: 'pi pi-credit-card',   to: { name: 'billing-plan' } },
+  { label: 'option.plan-billing',     icon: 'pi pi-credit-card',   to: { name: 'billing-plans' } },
   { label: 'option.profile',          icon: 'pi pi-user',          to: { name: 'iam-profile' } }
 ];
 
@@ -30,7 +30,7 @@ const merchantItems = [
   { label: 'option.shipment-tracking',  icon: 'pi pi-map-marker',  to: { name: 'execution-shipment-tracking' } },
   { label: 'option.shipment-history',   icon: 'pi pi-history',     to: { name: 'execution-shipment-history' } },
   { label: 'option.ratings',            icon: 'pi pi-star',        to: { name: 'reputation-ratings' } },
-  { label: 'option.plan-billing',       icon: 'pi pi-credit-card', to: { name: 'billing-plan' } },
+  { label: 'option.plan-billing',       icon: 'pi pi-credit-card', to: { name: 'billing-settlements' } },
   { label: 'option.profile',            icon: 'pi pi-user',        to: { name: 'iam-profile' } }
 ];
 

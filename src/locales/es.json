@@ -48,7 +48,8 @@
   },
   "errors": {
     "title": "Algo salió mal",
-    "network": "No pudimos conectar con el servidor de Trazza. Verifica que la API simulada esté en ejecución.",
+    "network": "No pudimos conectar con el servidor de Trazza. Revisa tu conexión e inténtalo de nuevo.",
+    "server": "El servidor de Trazza no pudo completar la solicitud. Es posible que esta función aún no esté disponible.",
     "unexpected": "Ocurrió un error inesperado. Inténtalo de nuevo."
   },
   "alerts": {
@@ -93,7 +94,8 @@
     "card-number": "Número de tarjeta",
     "card-holder": "Titular",
     "expiry": "Vencimiento",
-    "receipt-type": "Comprobante"
+    "receipt-type": "Comprobante",
+    "business-type": "Tipo de negocio"
   },
   "columns": {
     "actions": "Acciones",
@@ -198,7 +200,7 @@
     "merchant-title": "Soy emprendedor",
     "merchant-description": "Necesito enviar mercadería",
     "dni-placeholder": "8 dígitos",
-    "dni-hint": "Los emprendedores ingresan el RUC de su negocio.",
+    "dni-hint": "DNI del titular de la cuenta.",
     "ruc-placeholder": "11 dígitos",
     "ruc-hint": "RUC de tu negocio (empieza con 10 o 20).",
     "password-prompt": "Mínimo 8 caracteres",
@@ -207,7 +209,8 @@
     "password-strong": "Fuerte",
     "accept-terms": "Acepto los Términos y Condiciones y la Política de Privacidad",
     "submit": "Crear cuenta",
-    "have-account": "¿Ya tienes una cuenta?"
+    "have-account": "¿Ya tienes una cuenta?",
+    "business-type-placeholder": "Ej. Bodega, panadería"
   },
   "profile": {
     "title": "Perfil",
@@ -657,6 +660,12 @@
     "vehicle-invalid": "Vehículo inválido.",
     "vehicle-not-found": "El vehículo no existe.",
     "vehicle-required": "Selecciona un vehículo.",
-    "volume-exceeds-vehicle": "El volumen no puede superar el del vehículo."
+    "volume-exceeds-vehicle": "El volumen no puede superar el del vehículo.",
+    "business-type-required": "Ingresa el tipo de tu negocio.",
+    "dni-already-registered": "Este DNI ya está registrado.",
+    "ruc-already-registered": "Este RUC ya está registrado.",
+    "merchant-data-required": "Ingresa los datos de tu negocio.",
+    "role-required": "Elige cómo usarás Trazza.",
+    "authentication-required": "Debes iniciar sesión."
   }
 }
