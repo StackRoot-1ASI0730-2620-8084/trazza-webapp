@@ -13,7 +13,10 @@
     "freight-requests": "Freight Requests",
     "find-carriers": "Find Carriers",
     "shipment-tracking": "Shipment Tracking",
-    "shipment-history": "Shipment History"
+    "shipment-history": "Shipment History",
+    "plans": "Plans",
+    "subscriptions": "My subscription",
+    "settlements": "Settlements"
   },
   "menu": {
     "carrier-account": "Carrier account",
@@ -117,7 +120,8 @@
     "status": "Status",
     "suggestions": "Suggestions",
     "vehicle": "Vehicle",
-    "weight": "Weight"
+    "weight": "Weight",
+    "trip": "Trip"
   },
   "filters": {
     "all-statuses": "All statuses",
@@ -147,7 +151,14 @@
     "in_transit": "In transit",
     "delivered": "Delivered",
     "paid": "Paid",
-    "failed": "Failed"
+    "failed": "Failed",
+    "past_due": "Past due",
+    "refunded": "Refunded",
+    "marked_paid": "Marked as paid",
+    "settled": "Settled",
+    "paid_externally": "Paid outside Trazza",
+    "waived": "Waived",
+    "disputed": "Disputed"
   },
   "cargo-types": {
     "general": "General",
@@ -498,6 +509,59 @@
     "pay": "Pay {price}",
     "limit-reached": "You reached the monthly publication limit of the Free plan."
   },
+  "plan": {
+    "title": "Monitoring plans",
+    "subtitle": "Choose how to monitor your trucks: route only, IoT cargo monitoring or a package for your fleet.",
+    "per-month": "/ month",
+    "per-truck-month": "/ truck / month",
+    "min-trucks": "{min} trucks or more",
+    "range-trucks": "{min} to {max} trucks",
+    "includes-iot": "Includes IoT device",
+    "subscribe": "Subscribe",
+    "subscribe-to": "Subscribe to {name}",
+    "choose-trucks": "Choose the trucks",
+    "monthly-total": "Monthly total",
+    "pay-simulated": "Pay (simulated)",
+    "simulated-note": "Payment is simulated: no real charge is made.",
+    "subscribed": "Subscription activated.",
+    "types": {
+      "route": "Route monitoring",
+      "iot_cargo": "IoT cargo monitoring",
+      "full": "Route and IoT cargo"
+    }
+  },
+  "subscription": {
+    "title": "My subscription",
+    "subtitle": "Review your active plan, the current period and your payments.",
+    "empty": "You do not have a subscription yet. See the",
+    "period": "Current period",
+    "operation": "Operation no.",
+    "renew": "Renew",
+    "cancel": "Cancel subscription",
+    "confirm-cancel": "Do you want to cancel your subscription? Your trucks will stop being monitored at the end of the period.",
+    "renewed": "Subscription renewed.",
+    "cancelled": "Subscription cancelled."
+  },
+  "settlement": {
+    "title": "Settlements",
+    "subtitle": "Freight payments between merchants and carriers, and cancellation compensations.",
+    "freight": "Freight payments",
+    "empty": "There are no pending freight payments.",
+    "reference": "Payment reference",
+    "mark-paid": "Mark as paid",
+    "confirm": "Confirm receipt",
+    "external-note": "Freight is paid outside Trazza (bank transfer, Yape or Plin). Enter the reference so the carrier can confirm receipt.",
+    "marked-paid": "Payment recorded. The carrier must confirm it.",
+    "confirmed": "Payment receipt confirmed."
+  },
+  "compensation": {
+    "title": "Cancellation compensations",
+    "rule": "If a confirmed trip is cancelled, the party who cancels compensates the other.",
+    "empty": "There are no pending compensations.",
+    "confirm-paid": "Confirm payment",
+    "waive": "Waive",
+    "dispute": "Dispute"
+  },
   "receipt": {
     "title": "Electronic receipt",
     "types": {
@@ -666,6 +730,7 @@
     "ruc-already-registered": "This RUC is already registered.",
     "merchant-data-required": "Enter the data of your business.",
     "role-required": "Choose how you will use Trazza.",
-    "authentication-required": "You must sign in."
+    "authentication-required": "You must sign in.",
+    "plan-vehicle-count": "The number of trucks does not match the selected plan."
   }
 }
