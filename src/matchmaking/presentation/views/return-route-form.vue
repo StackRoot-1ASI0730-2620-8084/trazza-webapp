@@ -97,7 +97,7 @@ const publishRoute = async () => {
     </pv-message>
     <pv-message v-if="limitReached" severity="warn" class="mb-3">
       {{ t('billing.limit-reached') }}
-      <router-link :to="{ name: 'billing-plan' }" class="font-semibold underline ml-1">{{ t('billing.upgrade') }}</router-link>
+      <router-link :to="{ name: 'billing-plans' }" class="font-semibold underline ml-1">{{ t('billing.upgrade') }}</router-link>
     </pv-message>
     <div class="grid">
       <form class="col-12 lg:col-8" @submit.prevent="publishRoute">

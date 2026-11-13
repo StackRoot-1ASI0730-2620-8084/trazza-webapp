@@ -31,13 +31,17 @@ const loadContexts = async () => {
     [useProfileStore(), store => store.fetchProfiles()],
     [useMatchmakingStore(), store => store.fetchAll()],
     [useExecutionStore(), store => store.fetchShipments()],
-    [useBillingStore(), store => store.fetchBilling()],
+    [useBillingStore(), store => Promise.all([store.fetchPlans(), store.fetchSubscriptions(), store.fetchSettlements()])],
     [useReputationStore(), store => store.fetchRatings()]
   ];
   const errors = (await Promise.all(loads.map(async ([store, load]) => {
-    const previousCount = store.state.errors.length;
-    await load(store);
-    return store.state.errors.slice(previousCount);
+    const previousCount = store.state.errors?.length ?? 0;
+    try {
+      await load(store);
+    } catch (error) {
+      return [error];
+    }
+    return store.state.errors?.slice(previousCount) ?? [];
   }))).flat();
 
   const connectionError = errors.find(error => error?.isAxiosError && !error.response);
