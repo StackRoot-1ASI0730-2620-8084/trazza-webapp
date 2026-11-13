@@ -52,8 +52,8 @@
   "errors": {
     "title": "Something went wrong",
     "network": "We could not connect to the Trazza server. Check your connection and try again.",
-    "server": "The Trazza server could not complete the request. This feature may not be available yet.",
-    "unexpected": "An unexpected error occurred. Please try again."
+    "unexpected": "An unexpected error occurred. Please try again.",
+    "server": "The Trazza server could not complete the request. This feature may not be available yet."
   },
   "alerts": {
     "offers-waiting": "You have {count} offer(s) waiting for your answer",
@@ -98,6 +98,7 @@
     "card-holder": "Card holder",
     "expiry": "Expiry",
     "receipt-type": "Receipt",
+    "comment": "Comment",
     "business-type": "Type of business"
   },
   "columns": {
@@ -121,6 +122,8 @@
     "suggestions": "Suggestions",
     "vehicle": "Vehicle",
     "weight": "Weight",
+    "points": "Points",
+    "reason": "Reason",
     "trip": "Trip"
   },
   "filters": {
@@ -466,9 +469,20 @@
     "comment": "Comment (optional)",
     "skip": "Skip",
     "submit": "Submit rating",
-    "sent": "Thanks! Your rating was saved.",
+    "sent": "Thanks for your rating.",
     "rate-merchant": "Rate the merchant",
-    "rate-carrier": "Rate the carrier"
+    "rate-carrier": "Rate the carrier",
+    "count": "{count} ratings",
+    "empty": "No ratings yet.",
+    "given": "Given",
+    "list-subtitle": "What others say about you and what you said.",
+    "list-title": "Ratings",
+    "points-hint": "You earn 2 points for rating.",
+    "rate": "Rate {name}",
+    "received": "Received",
+    "send": "Send rating",
+    "title": "Rate {name}",
+    "view-trip": "View trip"
   },
   "reputation": {
     "title": "Ratings",
@@ -479,6 +493,21 @@
     "no-ratings": "No ratings yet",
     "average-of": "{average} ({count} ratings)",
     "empty": "There are no ratings yet."
+  },
+  "points": {
+    "balance": "Balance",
+    "empty": "No movements yet.",
+    "reasons": {
+      "adjustment": "Adjustment",
+      "rating-given": "Rating given",
+      "redemption": "Redemption",
+      "trip-completed": "Trip confirmed"
+    },
+    "redeem": "Redeem points",
+    "redeemed": "Points redeemed.",
+    "rules": "You earn 10 points per confirmed trip and 2 per rating you give.",
+    "subtitle": "Your loyalty points.",
+    "title": "Points"
   },
   "billing": {
     "title": "Plan & Billing",
@@ -508,59 +537,6 @@
     "test-cards": "Test cards: 4242 4242 4242 4242 is approved, 4000 0000 0000 0002 is declined.",
     "pay": "Pay {price}",
     "limit-reached": "You reached the monthly publication limit of the Free plan."
-  },
-  "plan": {
-    "title": "Monitoring plans",
-    "subtitle": "Choose how to monitor your trucks: route only, IoT cargo monitoring or a package for your fleet.",
-    "per-month": "/ month",
-    "per-truck-month": "/ truck / month",
-    "min-trucks": "{min} trucks or more",
-    "range-trucks": "{min} to {max} trucks",
-    "includes-iot": "Includes IoT device",
-    "subscribe": "Subscribe",
-    "subscribe-to": "Subscribe to {name}",
-    "choose-trucks": "Choose the trucks",
-    "monthly-total": "Monthly total",
-    "pay-simulated": "Pay (simulated)",
-    "simulated-note": "Payment is simulated: no real charge is made.",
-    "subscribed": "Subscription activated.",
-    "types": {
-      "route": "Route monitoring",
-      "iot_cargo": "IoT cargo monitoring",
-      "full": "Route and IoT cargo"
-    }
-  },
-  "subscription": {
-    "title": "My subscription",
-    "subtitle": "Review your active plan, the current period and your payments.",
-    "empty": "You do not have a subscription yet. See the",
-    "period": "Current period",
-    "operation": "Operation no.",
-    "renew": "Renew",
-    "cancel": "Cancel subscription",
-    "confirm-cancel": "Do you want to cancel your subscription? Your trucks will stop being monitored at the end of the period.",
-    "renewed": "Subscription renewed.",
-    "cancelled": "Subscription cancelled."
-  },
-  "settlement": {
-    "title": "Settlements",
-    "subtitle": "Freight payments between merchants and carriers, and cancellation compensations.",
-    "freight": "Freight payments",
-    "empty": "There are no pending freight payments.",
-    "reference": "Payment reference",
-    "mark-paid": "Mark as paid",
-    "confirm": "Confirm receipt",
-    "external-note": "Freight is paid outside Trazza (bank transfer, Yape or Plin). Enter the reference so the carrier can confirm receipt.",
-    "marked-paid": "Payment recorded. The carrier must confirm it.",
-    "confirmed": "Payment receipt confirmed."
-  },
-  "compensation": {
-    "title": "Cancellation compensations",
-    "rule": "If a confirmed trip is cancelled, the party who cancels compensates the other.",
-    "empty": "There are no pending compensations.",
-    "confirm-paid": "Confirm payment",
-    "waive": "Waive",
-    "dispute": "Dispute"
   },
   "receipt": {
     "title": "Electronic receipt",
@@ -732,5 +708,58 @@
     "role-required": "Choose how you will use Trazza.",
     "authentication-required": "You must sign in.",
     "plan-vehicle-count": "The number of trucks does not match the selected plan."
+  },
+  "plan": {
+    "title": "Monitoring plans",
+    "subtitle": "Choose how to monitor your trucks: route only, IoT cargo monitoring or a package for your fleet.",
+    "per-month": "/ month",
+    "per-truck-month": "/ truck / month",
+    "min-trucks": "{min} trucks or more",
+    "range-trucks": "{min} to {max} trucks",
+    "includes-iot": "Includes IoT device",
+    "subscribe": "Subscribe",
+    "subscribe-to": "Subscribe to {name}",
+    "choose-trucks": "Choose the trucks",
+    "monthly-total": "Monthly total",
+    "pay-simulated": "Pay (simulated)",
+    "simulated-note": "Payment is simulated: no real charge is made.",
+    "subscribed": "Subscription activated.",
+    "types": {
+      "route": "Route monitoring",
+      "iot_cargo": "IoT cargo monitoring",
+      "full": "Route and IoT cargo"
+    }
+  },
+  "subscription": {
+    "title": "My subscription",
+    "subtitle": "Review your active plan, the current period and your payments.",
+    "empty": "You do not have a subscription yet. See the",
+    "period": "Current period",
+    "operation": "Operation no.",
+    "renew": "Renew",
+    "cancel": "Cancel subscription",
+    "confirm-cancel": "Do you want to cancel your subscription? Your trucks will stop being monitored at the end of the period.",
+    "renewed": "Subscription renewed.",
+    "cancelled": "Subscription cancelled."
+  },
+  "settlement": {
+    "title": "Settlements",
+    "subtitle": "Freight payments between merchants and carriers, and cancellation compensations.",
+    "freight": "Freight payments",
+    "empty": "There are no pending freight payments.",
+    "reference": "Payment reference",
+    "mark-paid": "Mark as paid",
+    "confirm": "Confirm receipt",
+    "external-note": "Freight is paid outside Trazza (bank transfer, Yape or Plin). Enter the reference so the carrier can confirm receipt.",
+    "marked-paid": "Payment recorded. The carrier must confirm it.",
+    "confirmed": "Payment receipt confirmed."
+  },
+  "compensation": {
+    "title": "Cancellation compensations",
+    "rule": "If a confirmed trip is cancelled, the party who cancels compensates the other.",
+    "empty": "There are no pending compensations.",
+    "confirm-paid": "Confirm payment",
+    "waive": "Waive",
+    "dispute": "Dispute"
   }
 }
