@@ -18,7 +18,10 @@
     "subscriptions": "My subscription",
     "settlements": "Settlements",
     "drivers": "Drivers",
-    "saved-addresses": "Saved addresses"
+    "saved-addresses": "Saved addresses",
+    "open-shipments": "Open shipments",
+    "proposals": "Offers",
+    "shipment-requests": "My shipments"
   },
   "menu": {
     "carrier-account": "Carrier account",
@@ -48,7 +51,8 @@
     "reject": "Reject",
     "save-changes": "Save changes",
     "send": "Send",
-    "save": "Save"
+    "save": "Save",
+    "open": "Open"
   },
   "messages": {
     "done": "Done"
@@ -116,7 +120,17 @@
     "max-load": "Max load (kg)",
     "model": "Model",
     "volume": "Volume (m³)",
-    "width": "Width (m)"
+    "width": "Width (m)",
+    "delivery": "Delivery",
+    "departure": "Departure",
+    "destination": "Destination",
+    "driver": "Driver",
+    "max-shipments": "Shipments per trip",
+    "origin": "Origin",
+    "pickup": "Pick-up",
+    "pickup-from": "Pick-up from",
+    "pickup-until": "Pick-up until",
+    "reason": "Reason"
   },
   "columns": {
     "actions": "Actions",
@@ -141,7 +155,11 @@
     "weight": "Weight",
     "points": "Points",
     "reason": "Reason",
-    "trip": "Trip"
+    "trip": "Trip",
+    "cargo": "Cargo",
+    "departure": "Departure",
+    "shipment": "Shipment",
+    "slots": "Slots"
   },
   "filters": {
     "all-statuses": "All statuses",
@@ -181,7 +199,12 @@
     "disputed": "Disputed",
     "inactive": "Inactive",
     "submitted": "Submitted",
-    "validated": "Validated"
+    "validated": "Validated",
+    "published": "Published",
+    "full": "Full",
+    "in_progress": "In progress",
+    "completed": "Completed",
+    "expired": "Expired"
   },
   "cargo-types": {
     "general": "General",
@@ -312,7 +335,13 @@
     "close": "Close route",
     "confirm-close": "Close the route {route}? Open offers will be closed too.",
     "view-suggestions": "View suggestions",
-    "empty": "You have not published return routes yet."
+    "empty": "You have not published return routes yet.",
+    "cancel": "Cancel route",
+    "confirm-cancel": "Cancel the route {route}?",
+    "free": "free",
+    "max-shipments-hint": "A truck carries at most 2 shipments per trip.",
+    "no-driver": "No driver assigned",
+    "cancelled": "Route cancelled."
   },
   "load-suggestions": {
     "title": "Load suggestions",
@@ -365,7 +394,14 @@
       "matched": "Match confirmed with {merchant}. Check your active trip.",
       "rejected": "The offer was rejected.",
       "closed": "This offer was closed."
-    }
+    },
+    "choose-route": "Choose one of your open routes",
+    "make": "Make offer",
+    "rate": "Your rate",
+    "route": "Route",
+    "send": "Send offer",
+    "single-offer-hint": "You can make a single offer. The merchant accepts or rejects it, there are no counter-offers.",
+    "title": "Offer for this shipment"
   },
   "offers": {
     "title": "Offers",
@@ -745,7 +781,17 @@
     "merchant-data-required": "Enter the data of your business.",
     "role-required": "Choose how you will use Trazza.",
     "authentication-required": "You must sign in.",
-    "plan-vehicle-count": "The number of trucks does not match the selected plan."
+    "plan-vehicle-count": "The number of trucks does not match the selected plan.",
+    "address-required": "Write the address.",
+    "departure-future": "The departure must be in the future.",
+    "description-required": "Write a description.",
+    "max-shipments": "A trip carries 1 or 2 shipments.",
+    "pickup-window": "The pick-up end must be after its start.",
+    "pickup-window-past": "The pick-up window already passed.",
+    "point-required": "Mark the point on the map.",
+    "reason-required": "Write the reason.",
+    "volume-positive": "The volume must be greater than 0.",
+    "weight-positive": "The weight must be greater than 0."
   },
   "plan": {
     "title": "Monitoring plans",
@@ -818,5 +864,60 @@
     "label-placeholder": "Warehouse, Home…",
     "subtitle": "Places you use often.",
     "title": "Saved addresses"
+  },
+  "chat": {
+    "closed": "The chat is closed. Messages are deleted when the trip ends.",
+    "empty": "No messages yet. Say hello!",
+    "me": "Me",
+    "placeholder": "Write a message…",
+    "retention-hint": "Messages are deleted when the trip is delivered, confirmed or cancelled.",
+    "send": "Send",
+    "title": "Chat"
+  },
+  "open-shipments": {
+    "empty": "No open shipments right now.",
+    "need-route": "Publish a return route first to make offers.",
+    "subtitle": "Shipment requests waiting for a truck.",
+    "title": "Open shipments"
+  },
+  "proposal": {
+    "accept": "Accept",
+    "cancel": "Withdraw offer",
+    "detail-title": "Offer",
+    "empty": "No offers yet.",
+    "go-to-trip": "Go to trip",
+    "list-subtitle-carrier": "Offers you made on shipments.",
+    "list-subtitle-merchant": "Offers carriers made on your shipments.",
+    "list-title": "Offers",
+    "phone-hidden": "The phone number is shown once the offer is accepted.",
+    "reject": "Reject",
+    "confirm-accept": "Accept this offer? A trip is created and the other offers for this shipment are closed.",
+    "confirm-reject": "Reject this offer?",
+    "confirm-cancel": "Withdraw your offer?",
+    "accepted": "Offer accepted. The trip was created.",
+    "rejected": "Offer rejected.",
+    "canceled": "Offer withdrawn."
+  },
+  "route-suggestions": {
+    "empty": "No compatible shipments yet. We look 25 km around your path.",
+    "route-not-open": "This route no longer accepts offers.",
+    "subtitle": "Shipments along your path that fit the free capacity.",
+    "title": "Compatible shipments"
+  },
+  "shipment": {
+    "cancel": "Cancel shipment",
+    "compatible-routes": "Compatible routes",
+    "compatible-routes-hint": "Routes that pass near your pick-up and delivery points. Carriers make the offer.",
+    "empty": "You have not published shipments yet.",
+    "list-subtitle": "Cargo you need to move.",
+    "list-title": "My shipments",
+    "new-subtitle": "Describe the cargo and mark the exact points on the map.",
+    "new-title": "New shipment",
+    "no-compatible-routes": "No compatible routes right now.",
+    "pickup-window": "Pick-up window",
+    "publish": "Publish shipment",
+    "view-routes": "Compatible routes",
+    "cancelled": "Shipment cancelled.",
+    "published": "Shipment published."
   }
 }

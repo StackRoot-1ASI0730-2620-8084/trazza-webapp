@@ -74,7 +74,7 @@ const confirmReception = async () => {
       <i class="pi pi-map-marker text-4xl text-primary"></i>
       <p class="font-semibold mb-1">{{ t('tracking.no-shipments') }}</p>
       <p class="trazza-muted mt-0">{{ t('tracking.no-shipments-hint') }}</p>
-      <pv-button :label="t('option.freight-requests')" icon="pi pi-box" @click="router.push({ name: 'matchmaking-freight-requests' })"/>
+      <pv-button :label="t('option.shipment-requests')" icon="pi pi-box" @click="router.push({ name: 'matchmaking-shipment-requests' })"/>
     </div>
     <template v-else>
       <div class="trazza-page-header flex flex-wrap justify-content-between align-items-center gap-3 mb-4">

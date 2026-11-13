@@ -92,7 +92,7 @@ const confirmDelivery = (acknowledge = false) => {
       <i class="pi pi-truck text-4xl text-primary"></i>
       <p class="font-semibold mb-1">{{ t('trip.no-active') }}</p>
       <p class="trazza-muted mt-0">{{ t('trip.no-active-hint') }}</p>
-      <pv-button :label="t('option.load-suggestions')" icon="pi pi-box" @click="router.push({ name: 'matchmaking-load-suggestions' })"/>
+      <pv-button :label="t('option.open-shipments')" icon="pi pi-box" @click="router.push({ name: 'matchmaking-open-shipments' })"/>
     </div>
     <template v-else>
       <div class="trazza-page-header flex flex-wrap justify-content-between align-items-center gap-3 mb-4">

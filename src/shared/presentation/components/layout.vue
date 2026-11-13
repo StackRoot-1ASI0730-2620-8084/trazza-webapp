@@ -6,7 +6,6 @@ import SideMenu from "./side-menu.vue";
 import TopBar from "./top-bar.vue";
 import LanguageSwitcher from "./language-switcher.vue";
 import useIamStore from "../../../iam/application/iam.store.js";
-import useProfileStore from "../../../iam/application/profile.store.js";
 import useMatchmakingStore from "../../../matchmaking/application/matchmaking.store.js";
 import useExecutionStore from "../../../execution/application/execution.store.js";
 import useBillingStore from "../../../billing/application/billing.store.js";
@@ -29,8 +28,8 @@ const isPublicRoute = computed(() => route.meta?.public === true);
  */
 const loadContexts = async () => {
   const loads = [
-    [useProfileStore(), store => store.fetchProfiles()],
-    [useMatchmakingStore(), store => store.fetchAll()],
+    [iamStore, store => store.refreshAccount()],
+    [useMatchmakingStore(), store => store.fetchAll(iamStore.activeRole.value)],
     [useExecutionStore(), store => store.fetchShipments()],
     [useBillingStore(), store => Promise.all([store.fetchPlans(), store.fetchSubscriptions(), store.fetchSettlements()])],
     [useReputationStore(), store => store.fetchRatings()]
